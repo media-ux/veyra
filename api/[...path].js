@@ -13,6 +13,7 @@ import express from 'express'
 import { buildSeed } from '../server/seed.js'
 import { fetchManatalCandidates, hasManatalKey, starterDraft } from '../server/manatal.js'
 import { draftMessage, classifyReply, hasDeepSeekKey } from '../server/ai.js'
+import { authRequired, checkCredentials, makeToken, requireAuth } from '../server/auth.js'
 
 const LIMITS = { dailyMax: 20, weeklyMax: 90 }
 
@@ -64,13 +65,23 @@ const makeId = (p = 'id') => `${p}_${Math.random().toString(36).slice(2, 10)}`
 const app = express()
 app.use(express.json())
 
+// --- Public routes (no login needed) ----------------------------------------
+app.get('/api/health', (_req, res) => res.json({ ok: true }))
+app.get('/api/auth/config', (_req, res) => res.json({ authRequired: authRequired(), demo: false }))
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body || {}
+  if (checkCredentials(username, password)) return res.json({ token: makeToken() })
+  return res.status(401).json({ error: 'invalid', reason: 'Wrong username or password.' })
+})
+
+// --- Everything below requires a valid token (when auth is on) --------------
+app.use(requireAuth)
+
 // Pull Manatal data before serving any read.
 app.use(async (_req, _res, next) => {
   await ensureManatal()
   next()
 })
-
-app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
 app.get('/api/connections', (_req, res) => {
   res.json({

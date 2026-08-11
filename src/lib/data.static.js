@@ -15,6 +15,27 @@ let db = buildSeed()
 const delay = (v, ms = 220) => new Promise((r) => setTimeout(() => r(v), ms))
 const clone = (v) => JSON.parse(JSON.stringify(v))
 
+// --- Auth (demo) ------------------------------------------------------------
+// The public preview has no server, so this is a cosmetic gate that shows off
+// the login screen. Demo credentials are admin / demo.
+const TOKEN_KEY = 'oc_token'
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY) || ''
+}
+export function logout() {
+  localStorage.removeItem(TOKEN_KEY)
+}
+export function getAuthConfig() {
+  return delay({ authRequired: true, demo: true })
+}
+export function login(username, password) {
+  if (username === 'admin' && password === 'demo') {
+    localStorage.setItem(TOKEN_KEY, 'demo')
+    return delay(true)
+  }
+  return Promise.reject(new Error('Demo login is admin / demo'))
+}
+
 export function getAccounts() {
   return delay(clone(db.accounts))
 }

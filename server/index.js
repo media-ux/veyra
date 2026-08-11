@@ -13,6 +13,7 @@ import dotenv from 'dotenv'
 import { read, write, reset, makeId } from './store.js'
 import { draftMessage, classifyReply, hasDeepSeekKey } from './ai.js'
 import { fetchManatalCandidates, hasManatalKey, starterDraft } from './manatal.js'
+import { authRequired, checkCredentials, makeToken, requireAuth } from './auth.js'
 
 dotenv.config()
 
@@ -22,8 +23,21 @@ app.use(express.json())
 
 const PORT = process.env.PORT || 5174
 
-// --- Health & connection status ---------------------------------------------
+// --- Public routes (no login needed) ----------------------------------------
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
+
+// Tells the frontend whether to show the login screen.
+app.get('/api/auth/config', (_req, res) => res.json({ authRequired: authRequired(), demo: false }))
+
+// Exchange username + password for a signed token.
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body || {}
+  if (checkCredentials(username, password)) return res.json({ token: makeToken() })
+  return res.status(401).json({ error: 'invalid', reason: 'Wrong username or password.' })
+})
+
+// --- Everything below this line requires a valid token (when auth is on) -----
+app.use(requireAuth)
 
 // Report whether keys are configured (so Settings can show connection status)
 // WITHOUT ever exposing the key values themselves.

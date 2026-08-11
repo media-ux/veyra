@@ -126,8 +126,14 @@ link that pulls your real candidates, deploy to Vercel (free tier is fine):
    `media-ux` organisation.)
 3. Before clicking Deploy, open **Environment Variables** and add:
    - **Name:** `MANATAL_API_KEY`  **Value:** your Manatal key
+   - **Name:** `APP_USERNAME`  **Value:** the login username you want
+   - **Name:** `APP_PASSWORD`  **Value:** the login password you want
    - (optional) **Name:** `DEEPSEEK_API_KEY` **Value:** your DeepSeek key
 4. Click **Deploy**. After about a minute you get a live URL.
+
+Setting `APP_PASSWORD` turns on the login screen — the site then asks for the
+username/password above, and the API refuses data without it. (Leave it unset
+and the app is open, e.g. for local testing.)
 
 On first load the app pulls up to 40 candidates straight from your Manatal
 account (photos, headlines, companies included). The key stays in Vercel's

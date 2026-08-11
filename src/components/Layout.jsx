@@ -8,6 +8,7 @@ import {
   Settings as SettingsIcon,
   Menu,
   X,
+  LogOut,
 } from 'lucide-react'
 import AuroraBackground from './AuroraBackground.jsx'
 
@@ -21,7 +22,7 @@ const NAV = [
 
 export { NAV }
 
-export default function Layout({ current, onNavigate, children }) {
+export default function Layout({ current, onNavigate, onLogout, children }) {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const NavList = ({ onClick }) => (
@@ -64,7 +65,7 @@ export default function Layout({ current, onNavigate, children }) {
         <div className="mt-8">
           <NavList />
         </div>
-        <Footer />
+        <Footer onLogout={onLogout} />
       </aside>
 
       {/* Mobile top bar */}
@@ -139,9 +140,17 @@ function Brand({ compact }) {
   )
 }
 
-function Footer() {
+function Footer({ onLogout }) {
   return (
-    <div className="mt-auto pt-6">
+    <div className="mt-auto space-y-2 pt-6">
+      {onLogout && (
+        <button
+          onClick={onLogout}
+          className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:bg-white/[0.05] hover:text-slate-100"
+        >
+          <LogOut size={18} /> Sign out
+        </button>
+      )}
       <div className="glass p-3">
         <p className="text-[11px] font-semibold text-slate-300">EX Venture</p>
         <p className="mt-0.5 text-[11px] text-slate-500">Recruiting outreach · human-sent</p>

@@ -35,14 +35,35 @@
 // ===========================================================================
 
 const API = '/api'
+const TOKEN_KEY = 'oc_token'
+
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY) || ''
+}
+function setToken(t) {
+  if (t) localStorage.setItem(TOKEN_KEY, t)
+}
+export function logout() {
+  localStorage.removeItem(TOKEN_KEY)
+}
 
 // Small helper used only by the local fetch implementation. When you move to
 // Base44 you can delete this — Base44 entities are called directly.
 async function api(path, options = {}) {
+  const token = getToken()
   const res = await fetch(`${API}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
     ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    },
   })
+  if (res.status === 401) {
+    // Token missing/expired — drop it and tell the app to show the login page.
+    logout()
+    window.dispatchEvent(new Event('oc-unauthorized'))
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
     const err = new Error(body.reason || body.error || `Request failed: ${res.status}`)
@@ -51,6 +72,23 @@ async function api(path, options = {}) {
     throw err
   }
   return res.json()
+}
+
+// ---------------------------------------------------------------------------
+// AUTH
+// ---------------------------------------------------------------------------
+export function getAuthConfig() {
+  // BASE44:  Base44 has its own auth — return { authRequired: false }.
+  return api('/auth/config')
+}
+
+export async function login(username, password) {
+  const { token } = await api('/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+  })
+  setToken(token)
+  return true
 }
 
 // ---------------------------------------------------------------------------
