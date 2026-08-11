@@ -20,7 +20,7 @@ const SCREENS = {
 
 export default function App() {
   const [screen, setScreen] = useState('dashboard')
-  const [auth, setAuth] = useState({ checked: false, required: false, demo: false, ok: false })
+  const [auth, setAuth] = useState({ checked: false, required: false, demo: false, ok: false, forced: false })
 
   // On load, ask the backend whether a login is required, and whether we
   // already hold a token.
@@ -28,36 +28,44 @@ export default function App() {
     getAuthConfig()
       .then((cfg) => {
         const required = Boolean(cfg.authRequired)
-        setAuth({
+        setAuth((a) => ({
+          ...a,
           checked: true,
           required,
           demo: Boolean(cfg.demo),
           ok: !required || Boolean(getToken()),
-        })
+        }))
       })
-      .catch(() => setAuth({ checked: true, required: false, demo: false, ok: true }))
+      // If we can't even reach the config endpoint, still let the 401 handler
+      // below force a login rather than getting stuck on a blank/loading screen.
+      .catch(() => setAuth((a) => ({ ...a, checked: true, required: false, demo: false, ok: true })))
   }, [])
 
-  // If any API call reports 401, drop back to the login screen.
+  // If ANY API call reports 401, drop straight to the login screen — even if we
+  // couldn't detect auth up front. This prevents ever being stranded on the
+  // loading skeletons when a token is missing, stale, or expired.
   useEffect(() => {
-    const onUnauth = () => setAuth((a) => ({ ...a, ok: false }))
+    const onUnauth = () => setAuth((a) => ({ ...a, forced: true, ok: false }))
     window.addEventListener('oc-unauthorized', onUnauth)
     return () => window.removeEventListener('oc-unauthorized', onUnauth)
   }, [])
 
   const handleLogout = useCallback(() => {
     doLogout()
-    setAuth((a) => ({ ...a, ok: false }))
+    setAuth((a) => ({ ...a, forced: true, ok: false }))
     setScreen('dashboard')
   }, [])
 
   // Nothing until we know whether auth is needed (avoids a login flash).
   if (!auth.checked) return <div className="min-h-screen bg-base-800" />
 
-  if (auth.required && !auth.ok) {
+  if ((auth.required && !auth.ok) || auth.forced) {
     return (
       <ToastProvider>
-        <Login demo={auth.demo} onSuccess={() => setAuth((a) => ({ ...a, ok: true }))} />
+        <Login
+          demo={auth.demo}
+          onSuccess={() => setAuth((a) => ({ ...a, ok: true, forced: false }))}
+        />
       </ToastProvider>
     )
   }
