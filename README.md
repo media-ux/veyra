@@ -115,6 +115,33 @@ it back to the fresh 20-candidate demo, use **Settings → Reset demo data** (or
 
 ---
 
+## Put it online (Vercel) — a link that shows your real Manatal data
+
+Running locally keeps everything on your machine. If you'd rather have a web
+link that pulls your real candidates, deploy to Vercel (free tier is fine):
+
+1. Go to **vercel.com** and sign in with GitHub.
+2. **Add New → Project**, and import the **media-ux/veyra** repository. (If you
+   don't see it, click "Adjust GitHub App permissions" and grant access to the
+   `media-ux` organisation.)
+3. Before clicking Deploy, open **Environment Variables** and add:
+   - **Name:** `MANATAL_API_KEY`  **Value:** your Manatal key
+   - (optional) **Name:** `DEEPSEEK_API_KEY` **Value:** your DeepSeek key
+4. Click **Deploy**. After about a minute you get a live URL.
+
+On first load the app pulls up to 40 candidates straight from your Manatal
+account (photos, headlines, companies included). The key stays in Vercel's
+server environment and is never exposed to the browser.
+
+Notes:
+- Edits like "mark as sent" or moving pipeline cards are kept in memory on the
+  server and reset when the instance sleeps — fine for viewing. Add a database
+  in `api/[...path].js` if you need those to persist.
+- If candidates don't appear, open **Settings** — the Manatal status there shows
+  the exact reason (e.g. a wrong key).
+
+---
+
 ## Moving to Base44 later
 
 Everything the app reads or writes goes through **one file**:
