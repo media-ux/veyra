@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Secrets — NEVER commit real keys
+.env
+.env.local
+
+# Local development database (regenerated from seed data on first run)
+server/data/db.json
+
+# Build output
+dist/
+
+# Logs & OS files
+*.log
+.DS_Store
