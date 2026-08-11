@@ -10,6 +10,7 @@ server/data/db.json
 
 # Build output
 dist/
+dist-preview/
 
 # Logs & OS files
 *.log
