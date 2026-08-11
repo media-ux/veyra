@@ -12,6 +12,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import { read, write, reset, makeId } from './store.js'
 import { draftMessage, classifyReply, hasDeepSeekKey } from './ai.js'
+import { fetchManatalCandidates, hasManatalKey, starterDraft } from './manatal.js'
 
 dotenv.config()
 
@@ -28,9 +29,44 @@ app.get('/api/health', (_req, res) => res.json({ ok: true }))
 // WITHOUT ever exposing the key values themselves.
 app.get('/api/connections', (_req, res) => {
   res.json({
-    manatal: process.env.MANATAL_API_KEY ? 'connected' : 'not connected',
+    manatal: hasManatalKey() ? 'connected' : 'not connected',
     deepseek: hasDeepSeekKey() ? 'connected' : 'not connected',
   })
+})
+
+// Pull real candidates from Manatal and replace the candidate list + rebuild
+// the send queue. Requires MANATAL_API_KEY in .env. Returns a clear error if
+// the key is missing or the API call fails.
+app.post('/api/manatal/sync', async (_req, res) => {
+  if (!hasManatalKey()) {
+    return res.status(400).json({ error: 'no_key', reason: 'Add MANATAL_API_KEY to .env, then restart.' })
+  }
+  try {
+    const pulled = await fetchManatalCandidates({ limit: 40 })
+    if (pulled.length === 0) {
+      return res.status(200).json({ ok: true, count: 0, reason: 'No candidates returned from Manatal.' })
+    }
+    const db = read()
+    const accounts = db.accounts
+    const candidates = pulled.map((c, i) => ({
+      id: `cand_m${i + 1}`,
+      assignedAccount: accounts[i % accounts.length].id,
+      ...c,
+    }))
+    db.candidates = candidates
+    db.queue = candidates.map((c, i) => ({
+      id: `q_m${i + 1}`,
+      candidateId: c.id,
+      accountId: c.assignedAccount,
+      draftMessage: starterDraft(c),
+      status: 'pending',
+      sentAt: null,
+    }))
+    write(db)
+    res.json({ ok: true, count: candidates.length })
+  } catch (err) {
+    res.status(502).json({ error: 'manatal_failed', reason: err.message })
+  }
 })
 
 // --- Accounts ---------------------------------------------------------------

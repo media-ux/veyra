@@ -16,6 +16,7 @@ import {
   getConnections,
   classifyReply,
   resetDemoData,
+  syncFromManatal,
 } from '../lib/data.js'
 import PageHeader from '../components/PageHeader.jsx'
 import { CardSkeleton } from '../components/Skeleton.jsx'
@@ -97,6 +98,7 @@ export default function Settings() {
             <ConnectionRow name="Manatal" status={connections?.manatal} />
             <ConnectionRow name="DeepSeek" status={connections?.deepseek} />
           </div>
+          <ManatalSync connected={connections?.manatal === 'connected'} />
         </Section>
 
         {/* Tone + daily target */}
@@ -194,6 +196,36 @@ function Section({ icon: Icon, title, children, delay = 0, className = '' }) {
       </div>
       {children}
     </motion.section>
+  )
+}
+
+function ManatalSync({ connected }) {
+  const toast = useToast()
+  const [busy, setBusy] = useState(false)
+  const run = async () => {
+    setBusy(true)
+    try {
+      const r = await syncFromManatal()
+      if (r.count === 0) toast.info('Connected, but Manatal returned no candidates.')
+      else toast.success(`Synced ${r.count} candidates from Manatal. Refresh the other screens.`)
+    } catch (err) {
+      toast.error(err.message || 'Manatal sync failed')
+    } finally {
+      setBusy(false)
+    }
+  }
+  return (
+    <div className="mt-4">
+      <button onClick={run} disabled={busy} className="btn-ghost w-full">
+        {busy ? 'Syncing…' : 'Sync candidates from Manatal'}
+      </button>
+      {!connected && (
+        <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
+          Add <code className="text-slate-400">MANATAL_API_KEY</code> to <code className="text-slate-400">.env</code> and
+          restart to enable this. In the shared preview it stays disabled (no server).
+        </p>
+      )}
+    </div>
   )
 }
 

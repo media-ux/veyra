@@ -64,6 +64,31 @@ const RAW_CANDIDATES = [
   ['Emma Novak', 'Design Engineer', 'Framer', 'Prague, Czechia', 'Bridges design and code — built the animation primitives used across the marketing site. Motion design expert.', 88, 'invited', 2],
 ]
 
+// A few skill tags per candidate, for visual richness on the cards. (When real
+// data is synced from Manatal these come from the candidate's Manatal profile.)
+const SKILLS = [
+  ['React', 'Performance', 'RSC'],
+  ['Go', 'Distributed systems', 'Observability'],
+  ['ML infra', 'Python', 'Feature stores'],
+  ['Kubernetes', 'FinOps', 'Terraform'],
+  ['Product design', 'Design systems', 'Figma'],
+  ['Flink', 'Kafka', 'Streaming'],
+  ['Security', 'Zero-trust', 'CTF'],
+  ['Leadership', 'Payments', 'Trunk-based'],
+  ['SwiftUI', 'Offline-first', 'Core Data'],
+  ['Next.js', 'Edge', 'Full-stack'],
+  ['SRE', 'Chaos eng', 'On-call'],
+  ['Rust', 'Async', 'Payments'],
+  ['Data science', 'Causal inference', 'Risk'],
+  ['Framer Motion', 'Latency', 'DX'],
+  ['Platform', 'IDP', 'Terraform'],
+  ['Product', 'AI features', 'Activation'],
+  ['ML', 'Quantization', 'Inference'],
+  ['Growth', 'A/B testing', 'Retention'],
+  ['Event-driven', 'Scale', 'Backend'],
+  ['Design eng', 'Motion', 'Animation'],
+]
+
 export function buildSeed() {
   const now = new Date('2026-08-11T09:00:00Z')
 
@@ -78,6 +103,9 @@ export function buildSeed() {
       company,
       location,
       profileUrl: `https://www.linkedin.com/in/${slug}`,
+      // Empty until synced from Manatal — the UI shows a generated avatar meanwhile.
+      photoUrl: '',
+      skills: SKILLS[i] || [],
       enrichmentSummary,
       matchScore,
       stage: STAGES.includes(stage) ? stage : 'sourced',

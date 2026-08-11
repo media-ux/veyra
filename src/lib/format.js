@@ -61,3 +61,34 @@ export function initials(name = '') {
     .join('')
     .toUpperCase()
 }
+
+// Deterministic hash so the same name always gets the same colours.
+function hash(str = '') {
+  let h = 0
+  for (let i = 0; i < str.length; i++) h = (h << 5) - h + str.charCodeAt(i)
+  return Math.abs(h)
+}
+
+// A pleasant, on-brand pair of hues for a generated avatar gradient.
+export function avatarGradient(seed = '') {
+  const h = hash(seed)
+  const h1 = h % 360
+  const h2 = (h1 + 40 + (h % 60)) % 360
+  return {
+    from: `hsl(${h1} 70% 55%)`,
+    to: `hsl(${h2} 75% 45%)`,
+    ring: `hsl(${h1} 70% 60%)`,
+  }
+}
+
+// A brand-ish tint for a company badge.
+export function companyColor(name = '') {
+  const h = hash('co-' + name) % 360
+  return `hsl(${h} 65% 58%)`
+}
+
+export function matchColor(score) {
+  if (score >= 90) return '#34d399'
+  if (score >= 80) return '#5b8cff'
+  return '#fbbf24'
+}

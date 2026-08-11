@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Send, Gauge, TrendingUp, MessageSquare, ArrowRight } from 'lucide-react'
-import { getStats, getAccounts } from '../lib/data.js'
+import { getStats, getAccounts, getReplies, getCandidates } from '../lib/data.js'
 import PageHeader from '../components/PageHeader.jsx'
 import CountUp from '../components/CountUp.jsx'
 import ProgressRing from '../components/ProgressRing.jsx'
 import ActivityChart from '../components/ActivityChart.jsx'
+import Avatar from '../components/Avatar.jsx'
 import { KpiSkeleton, Skeleton } from '../components/Skeleton.jsx'
-import { STAGES, stageMeta } from '../lib/format.js'
+import { STAGES, classificationMeta, relativeTime } from '../lib/format.js'
 
 const stagger = {
   hidden: {},
@@ -21,10 +22,14 @@ const rise = {
 export default function Dashboard({ onNavigate }) {
   const [stats, setStats] = useState(null)
   const [accounts, setAccounts] = useState(null)
+  const [replies, setReplies] = useState([])
+  const [candidates, setCandidates] = useState([])
 
   useEffect(() => {
     getStats().then(setStats)
     getAccounts().then(setAccounts)
+    getReplies().then(setReplies)
+    getCandidates().then(setCandidates)
   }, [])
 
   const loading = !stats || !accounts
@@ -164,6 +169,61 @@ export default function Dashboard({ onNavigate }) {
                 sublabel={`${a.weeklyQuotaUsed}/100`}
               />
             ))}
+          </div>
+        )}
+      </motion.div>
+
+      {/* Recent replies */}
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.44, type: 'spring', stiffness: 120, damping: 18 }}
+        className="glass mt-6 p-6"
+      >
+        <h2 className="mb-4 text-base font-semibold text-white">Recent replies</h2>
+        {loading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-16 w-full" />
+            ))}
+          </div>
+        ) : replies.length === 0 ? (
+          <p className="text-sm text-slate-500">No replies yet.</p>
+        ) : (
+          <div className="grid gap-3 md:grid-cols-3">
+            {replies.slice(0, 3).map((r, i) => {
+              const c = candidates.find((x) => x.id === r.candidateId)
+              const meta = classificationMeta(r.classification)
+              return (
+                <motion.div
+                  key={r.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + i * 0.06 }}
+                  whileHover={{ y: -3 }}
+                  className="rounded-xl border border-white/5 bg-white/[0.02] p-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar name={c?.name || 'Unknown'} photoUrl={c?.photoUrl} size={40} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-white">
+                        {c?.name || 'Unknown'}
+                      </p>
+                      <p className="text-[11px] text-slate-500">{relativeTime(r.receivedAt)}</p>
+                    </div>
+                    <span
+                      className="chip shrink-0 font-semibold"
+                      style={{ background: meta.bg, color: meta.color }}
+                    >
+                      {meta.label}
+                    </span>
+                  </div>
+                  <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-slate-400">
+                    "{r.text}"
+                  </p>
+                </motion.div>
+              )
+            })}
           </div>
         )}
       </motion.div>

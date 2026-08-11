@@ -24,7 +24,8 @@ import {
 import PageHeader from '../components/PageHeader.jsx'
 import { CardSkeleton } from '../components/Skeleton.jsx'
 import { useToast } from '../components/Toast.jsx'
-import { initials } from '../lib/format.js'
+import Avatar from '../components/Avatar.jsx'
+import { matchColor } from '../lib/format.js'
 
 const MAX_CHARS = 300
 const LIMITS = { dailyMax: 20, weeklyMax: 90 }
@@ -237,7 +238,48 @@ export default function SendQueue() {
       </div>
 
       {!done && <ShortcutHint />}
+
+      {!done && items.length - index > 1 && (
+        <UpNext items={items.slice(index + 1, index + 7)} />
+      )}
     </div>
+  )
+}
+
+function UpNext({ items }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.15, type: 'spring', stiffness: 120, damping: 20 }}
+      className="mt-8"
+    >
+      <p className="label mb-3">Up next in the queue</p>
+      <div className="flex gap-3 overflow-x-auto pb-2">
+        {items.map((q, i) => (
+          <motion.div
+            key={q.id}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 + i * 0.05 }}
+            whileHover={{ y: -3 }}
+            className="glass glass-hover flex w-56 shrink-0 items-center gap-3 p-3"
+          >
+            <Avatar name={q.candidate.name} photoUrl={q.candidate.photoUrl} size={40} />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-white">{q.candidate.name}</p>
+              <p className="truncate text-xs text-slate-400">{q.candidate.company}</p>
+            </div>
+            <span
+              className="ml-auto text-sm font-bold"
+              style={{ color: matchColor(q.candidate.matchScore) }}
+            >
+              {q.candidate.matchScore}
+            </span>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
   )
 }
 
@@ -265,51 +307,82 @@ function DailyProgress({ account, target, sent, remaining }) {
 
 function ProfilePanel({ candidate, account }) {
   return (
-    <div className="glass relative overflow-hidden p-6 sm:p-8">
-      <div className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-accent/10 blur-3xl" />
-      <div className="relative flex items-start justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-accent/15 text-lg font-bold text-accent ring-1 ring-accent/30">
-            {initials(candidate.name)}
+    <div className="glass relative overflow-hidden">
+      {/* Cover banner tinted by match quality */}
+      <div
+        className="h-20 w-full"
+        style={{
+          background: `linear-gradient(120deg, ${matchColor(candidate.matchScore)}33, rgba(91,140,255,0.18) 60%, transparent)`,
+        }}
+      />
+      <div className="px-6 pb-6 sm:px-8 sm:pb-8">
+        <div className="-mt-10 flex items-end justify-between gap-4">
+          <div className="flex items-end gap-4">
+            <Avatar
+              name={candidate.name}
+              photoUrl={candidate.photoUrl}
+              size={72}
+              className="ring-4 ring-base-700"
+            />
+            <div className="pb-1">
+              <h2 className="text-xl font-bold text-white">{candidate.name}</h2>
+              <p className="text-sm text-slate-400">{candidate.headline}</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-white">{candidate.name}</h2>
-            <p className="text-sm text-slate-400">{candidate.headline}</p>
-          </div>
+          <MatchScore score={candidate.matchScore} />
         </div>
-        <MatchScore score={candidate.matchScore} />
-      </div>
 
-      <div className="relative mt-6 flex flex-wrap gap-2">
-        <Meta icon={Building2} text={candidate.company} />
-        <Meta icon={MapPin} text={candidate.location} />
-      </div>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Meta icon={Building2} text={candidate.company} />
+          <Meta icon={MapPin} text={candidate.location} />
+        </div>
 
-      <div className="relative mt-6">
-        <p className="label mb-2 flex items-center gap-1.5">
-          <Sparkles size={12} className="text-accent" /> Enriched profile summary
-        </p>
-        <p className="text-[15px] leading-relaxed text-slate-200">
-          {candidate.enrichmentSummary}
-        </p>
-      </div>
+        {candidate.skills?.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {candidate.skills.map((s) => (
+              <span
+                key={s}
+                className="chip border border-accent/20 bg-accent/10 font-medium text-accent-soft"
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+        )}
 
-      <div className="relative mt-6 flex items-center gap-2 border-t border-white/5 pt-4 text-xs text-slate-500">
-        <span className="chip bg-white/[0.05] text-slate-300">Manatal · {candidate.manatalId}</span>
-        <span className="chip bg-white/[0.05] text-slate-300">Account · {account.name}</span>
+        <div className="mt-6">
+          <p className="label mb-2 flex items-center gap-1.5">
+            <Sparkles size={12} className="text-accent" /> Enriched profile summary
+          </p>
+          <p className="text-[15px] leading-relaxed text-slate-200">
+            {candidate.enrichmentSummary}
+          </p>
+        </div>
+
+        <div className="mt-6 flex items-center gap-2 border-t border-white/5 pt-4 text-xs text-slate-500">
+          <span className="chip bg-white/[0.05] text-slate-300">Manatal · {candidate.manatalId}</span>
+          <span className="chip bg-white/[0.05] text-slate-300">Account · {account.name}</span>
+        </div>
       </div>
     </div>
   )
 }
 
 function MatchScore({ score }) {
-  const color = score >= 90 ? '#34d399' : score >= 80 ? '#5b8cff' : '#fbbf24'
+  const color = matchColor(score)
   return (
-    <div className="text-right">
-      <div className="text-3xl font-extrabold" style={{ color }}>
-        {score}
+    <div
+      className="grid h-16 w-16 place-items-center rounded-2xl border text-center"
+      style={{ borderColor: `${color}44`, background: `${color}14` }}
+    >
+      <div>
+        <div className="text-2xl font-extrabold leading-none" style={{ color }}>
+          {score}
+        </div>
+        <p className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-slate-500">
+          Match
+        </p>
       </div>
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Match</p>
     </div>
   )
 }

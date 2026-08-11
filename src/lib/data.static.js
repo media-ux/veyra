@@ -121,6 +121,14 @@ export function classifyReply(text) {
   return delay({ classification, source: 'mock' }, 500)
 }
 
+// Manatal sync needs the backend + your key, which the static preview doesn't
+// have. Explain that clearly instead of failing silently.
+export function syncFromManatal() {
+  return Promise.reject(
+    new Error('Manatal sync runs in the full app (npm run dev) with your key in .env — not in this preview.'),
+  )
+}
+
 export function resetDemoData() {
   db = buildSeed()
   return delay({ ok: true })

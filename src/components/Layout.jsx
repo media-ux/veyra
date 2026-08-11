@@ -9,6 +9,7 @@ import {
   Menu,
   X,
 } from 'lucide-react'
+import AuroraBackground from './AuroraBackground.jsx'
 
 const NAV = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -56,6 +57,7 @@ export default function Layout({ current, onNavigate, children }) {
 
   return (
     <div className="flex min-h-screen">
+      <AuroraBackground />
       {/* Desktop sidebar */}
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-white/5 bg-base-900/60 p-5 backdrop-blur-xl lg:flex">
         <Brand />

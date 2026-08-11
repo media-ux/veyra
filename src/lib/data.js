@@ -156,6 +156,14 @@ export function classifyReply(text, candidateId) {
 }
 
 // ---------------------------------------------------------------------------
+// MANATAL — pull real candidates. Must stay server-side (key is private).
+// ---------------------------------------------------------------------------
+export function syncFromManatal() {
+  // BASE44:  return base44.functions.manatalSync()
+  return api('/manatal/sync', { method: 'POST' })
+}
+
+// ---------------------------------------------------------------------------
 // DEV ONLY: reset the seed data. Remove once you are on Base44.
 // ---------------------------------------------------------------------------
 export function resetDemoData() {

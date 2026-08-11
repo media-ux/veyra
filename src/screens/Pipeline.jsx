@@ -5,7 +5,8 @@ import { getCandidates, updateCandidate } from '../lib/data.js'
 import PageHeader from '../components/PageHeader.jsx'
 import { Skeleton } from '../components/Skeleton.jsx'
 import { useToast } from '../components/Toast.jsx'
-import { STAGES, initials } from '../lib/format.js'
+import Avatar from '../components/Avatar.jsx'
+import { STAGES, matchColor } from '../lib/format.js'
 
 export default function Pipeline() {
   const toast = useToast()
@@ -105,12 +106,7 @@ export default function Pipeline() {
                         className="group cursor-grab rounded-xl border border-white/5 bg-base-600/80 p-3 active:cursor-grabbing"
                       >
                         <div className="flex items-start gap-2.5">
-                          <div
-                            className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-xs font-bold"
-                            style={{ background: `${stage.color}22`, color: stage.color }}
-                          >
-                            {initials(c.name)}
-                          </div>
+                          <Avatar name={c.name} photoUrl={c.photoUrl} size={36} />
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-semibold text-white">{c.name}</p>
                             <p className="truncate text-xs text-slate-400">{c.headline}</p>
@@ -126,14 +122,7 @@ export default function Pipeline() {
                           </span>
                           <span
                             className="text-[11px] font-bold"
-                            style={{
-                              color:
-                                c.matchScore >= 90
-                                  ? '#34d399'
-                                  : c.matchScore >= 80
-                                    ? '#5b8cff'
-                                    : '#fbbf24',
-                            }}
+                            style={{ color: matchColor(c.matchScore) }}
                           >
                             {c.matchScore}
                           </span>
