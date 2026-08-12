@@ -41,6 +41,8 @@ export default function SendQueue() {
   const [regenerating, setRegenerating] = useState(false)
   const [busy, setBusy] = useState(false)
   const [dailyTarget, setDailyTarget] = useState(15)
+  const [source, setSource] = useState(null) // 'deepseek' | 'mock' | null
+  const [drafting, setDrafting] = useState(null) // { done, total } while batch drafting
   const draftRef = useRef('')
 
   // Load everything and stitch the queue together with candidate + account data.
@@ -70,6 +72,7 @@ export default function SendQueue() {
     if (current) {
       setDraft(current.draftMessage)
       draftRef.current = current.draftMessage
+      setSource(null) // unknown until (re)generated for this card
     }
   }, [current])
 
@@ -132,9 +135,10 @@ export default function SendQueue() {
     if (!current || regenerating) return
     setRegenerating(true)
     try {
-      const { message, source } = await generateMessage(current.candidate.id, tone)
+      const { message, source: src } = await generateMessage(current.candidate.id, tone)
       setDraft(message.slice(0, MAX_CHARS))
-      toast.success(source === 'deepseek' ? 'New message drafted' : 'New draft (local sample)')
+      setSource(src)
+      toast.success(src === 'deepseek' ? 'New message drafted' : 'New draft (local sample)')
     } catch (err) {
       toast.error(err.message || 'Could not regenerate')
     } finally {
@@ -148,6 +152,39 @@ export default function SendQueue() {
     window.open(current.candidate.profileUrl, '_blank', 'noopener')
     toast.info('Copied — paste it into LinkedIn and click send yourself')
   }, [current, toast])
+
+  // Batch personalisation: draft an AI message for every remaining candidate in
+  // the queue and save it, so they're all ready to review. Runs one at a time
+  // (kind to rate limits) with live progress.
+  const handleDraftAll = useCallback(async () => {
+    if (!items || drafting) return
+    const targets = items.slice(index)
+    if (targets.length === 0) return
+    setDrafting({ done: 0, total: targets.length })
+    let aiCount = 0
+    for (let k = 0; k < targets.length; k++) {
+      const q = targets[k]
+      try {
+        const { message, source: src } = await generateMessage(q.candidate.id, tone)
+        await updateQueueItem(q.id, { draftMessage: message })
+        if (src === 'deepseek') aiCount++
+        setItems((prev) => prev.map((it) => (it.id === q.id ? { ...it, draftMessage: message } : it)))
+        if (q.id === current?.id) {
+          setDraft(message)
+          setSource(src)
+        }
+      } catch {
+        /* skip a failed one and keep going */
+      }
+      setDrafting({ done: k + 1, total: targets.length })
+    }
+    setDrafting(null)
+    toast.success(
+      aiCount > 0
+        ? `Drafted ${targets.length} messages — ${aiCount} with DeepSeek AI`
+        : `Drafted ${targets.length} sample messages — add a DeepSeek key for real AI`,
+    )
+  }, [items, index, drafting, tone, current, toast])
 
   // Keyboard shortcuts: S = send, K = skip, R = regenerate.
   useEffect(() => {
@@ -179,7 +216,19 @@ export default function SendQueue() {
       <PageHeader
         title="Daily Send Queue"
         subtitle="Review, personalise, then send from your own LinkedIn — nothing is sent automatically."
-        actions={<ToneSelector tone={tone} onChange={setTone} />}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={handleDraftAll}
+              disabled={!!drafting || !items || items.length - index === 0}
+              className="btn-ghost"
+            >
+              <Sparkles size={15} className={drafting ? 'animate-pulse text-accent' : 'text-accent'} />
+              {drafting ? `Drafting ${drafting.done}/${drafting.total}…` : 'Draft all with AI'}
+            </button>
+            <ToneSelector tone={tone} onChange={setTone} />
+          </div>
+        }
       />
 
       {/* Daily target progress for the current account */}
@@ -219,6 +268,7 @@ export default function SendQueue() {
               <MessagePanel
                 draft={draft}
                 setDraft={setDraft}
+                source={source}
                 regenerating={regenerating}
                 busy={busy}
                 blocked={blocked}
@@ -398,6 +448,7 @@ function Meta({ icon: Icon, text }) {
 function MessagePanel({
   draft,
   setDraft,
+  source,
   regenerating,
   busy,
   blocked,
@@ -413,17 +464,35 @@ function MessagePanel({
 
   return (
     <div className="glass flex flex-col p-6 sm:p-8">
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3 flex items-center justify-between gap-2">
         <p className="label flex items-center gap-1.5">
           <Sparkles size={12} className="text-accent" /> AI-drafted connection note
         </p>
-        <span
-          className={`text-xs font-semibold ${
-            over ? 'text-bad' : near ? 'text-warn' : 'text-slate-500'
-          }`}
-        >
-          {count}/{MAX_CHARS}
-        </span>
+        <div className="flex items-center gap-2">
+          {source && (
+            <span
+              className={`chip font-semibold ${
+                source === 'deepseek'
+                  ? 'bg-accent/15 text-accent-soft'
+                  : 'bg-white/[0.05] text-slate-400'
+              }`}
+              title={
+                source === 'deepseek'
+                  ? 'Written by DeepSeek AI'
+                  : 'Sample text — add a DeepSeek key to enable real AI'
+              }
+            >
+              {source === 'deepseek' ? '✨ AI' : 'Sample'}
+            </span>
+          )}
+          <span
+            className={`text-xs font-semibold ${
+              over ? 'text-bad' : near ? 'text-warn' : 'text-slate-500'
+            }`}
+          >
+            {count}/{MAX_CHARS}
+          </span>
+        </div>
       </div>
 
       <div className="relative flex-1">
