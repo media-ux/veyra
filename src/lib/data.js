@@ -79,7 +79,7 @@ async function api(path, options = {}) {
 // ---------------------------------------------------------------------------
 export function getAuthConfig() {
   // BASE44:  Base44 has its own auth — return { authRequired: false }.
-  return api('/auth/config')
+  return api('/auth-config')
 }
 
 export async function login(username, password) {
@@ -109,7 +109,7 @@ export function getCandidates() {
 
 export function updateCandidate(id, patch) {
   // BASE44:  return Candidate.update(id, patch)
-  return api(`/candidates/${id}`, { method: 'PATCH', body: JSON.stringify(patch) })
+  return api('/candidate-update', { method: 'PATCH', body: JSON.stringify({ id, ...patch }) })
 }
 
 // ---------------------------------------------------------------------------
@@ -126,7 +126,7 @@ export function getQueue() {
 // the server (or a Base44 backend function) so it can't be bypassed.
 export function updateQueueItem(id, patch) {
   // BASE44:  return QueueItem.update(id, patch)   (enforce limits in a hook)
-  return api(`/queue/${id}`, { method: 'PATCH', body: JSON.stringify(patch) })
+  return api('/queue-update', { method: 'PATCH', body: JSON.stringify({ id, ...patch }) })
 }
 
 // ---------------------------------------------------------------------------
@@ -176,18 +176,20 @@ export function getConnections() {
 // ---------------------------------------------------------------------------
 
 // Draft / regenerate a personalised opening message for a candidate.
-export function generateMessage(candidateId, tone) {
+// Accepts either a candidate object (preferred — stateless on serverless) or an id.
+export function generateMessage(candidateOrId, tone) {
   // BASE44:  return base44.functions.draftMessage({ candidateId, tone })
-  return api('/ai/message', {
-    method: 'POST',
-    body: JSON.stringify({ candidateId, tone }),
-  })
+  const payload =
+    candidateOrId && typeof candidateOrId === 'object'
+      ? { candidate: candidateOrId, candidateId: candidateOrId.id, tone }
+      : { candidateId: candidateOrId, tone }
+  return api('/ai-message', { method: 'POST', body: JSON.stringify(payload) })
 }
 
 // Classify an incoming reply (interested / not interested / needs follow up).
 export function classifyReply(text, candidateId) {
   // BASE44:  return base44.functions.classifyReply({ text, candidateId })
-  return api('/ai/classify', {
+  return api('/ai-classify', {
     method: 'POST',
     body: JSON.stringify({ text, candidateId }),
   })
@@ -198,7 +200,7 @@ export function classifyReply(text, candidateId) {
 // ---------------------------------------------------------------------------
 export function syncFromManatal() {
   // BASE44:  return base44.functions.manatalSync()
-  return api('/manatal/sync', { method: 'POST' })
+  return api('/manatal-sync', { method: 'POST' })
 }
 
 // ---------------------------------------------------------------------------

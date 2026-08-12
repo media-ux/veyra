@@ -67,7 +67,7 @@ app.use(express.json())
 
 // --- Public routes (no login needed) ----------------------------------------
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
-app.get('/api/auth/config', (_req, res) => res.json({ authRequired: authRequired(), demo: false }))
+app.get('/api/auth-config', (_req, res) => res.json({ authRequired: authRequired(), demo: false }))
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body || {}
   if (checkCredentials(username, password)) return res.json({ token: makeToken() })
@@ -91,25 +91,27 @@ app.get('/api/connections', (_req, res) => {
 })
 
 // Surface how the live Manatal pull went (used by Settings).
-app.get('/api/manatal/status', (_req, res) => res.json(manatalState))
+app.get('/api/manatal-status', (_req, res) => res.json(manatalState))
 
 app.get('/api/accounts', (_req, res) => res.json(getDb().accounts))
 app.get('/api/candidates', (_req, res) => res.json(getDb().candidates))
 
-app.patch('/api/candidates/:id', (req, res) => {
-  const c = getDb().candidates.find((x) => x.id === req.params.id)
+// id comes in the body (single-segment path so Vercel routes it reliably).
+app.patch('/api/candidate-update', (req, res) => {
+  const { id, ...patch } = req.body || {}
+  const c = getDb().candidates.find((x) => x.id === id)
   if (!c) return res.status(404).json({ error: 'Candidate not found' })
-  Object.assign(c, req.body)
+  Object.assign(c, patch)
   res.json(c)
 })
 
 app.get('/api/queue', (_req, res) => res.json(getDb().queue))
 
-app.patch('/api/queue/:id', (req, res) => {
+app.patch('/api/queue-update', (req, res) => {
   const d = getDb()
-  const item = d.queue.find((q) => q.id === req.params.id)
+  const { id, status, draftMessage: newDraft } = req.body || {}
+  const item = d.queue.find((q) => q.id === id)
   if (!item) return res.status(404).json({ error: 'Queue item not found' })
-  const { status, draftMessage: newDraft } = req.body
   if (typeof newDraft === 'string') item.draftMessage = newDraft
   if (status === 'sent') {
     const account = d.accounts.find((a) => a.id === item.accountId)
@@ -168,20 +170,22 @@ app.get('/api/stats', (_req, res) => {
   })
 })
 
-app.post('/api/ai/message', async (req, res) => {
+app.post('/api/ai-message', async (req, res) => {
   const d = getDb()
-  const candidate = d.candidates.find((c) => c.id === req.body.candidateId)
+  // Prefer the candidate object sent by the browser (stateless & reliable on
+  // serverless); fall back to a lookup by id.
+  const candidate = req.body.candidate || d.candidates.find((c) => c.id === req.body.candidateId)
   if (!candidate) return res.status(404).json({ error: 'Candidate not found' })
   res.json(await draftMessage(candidate, req.body.tone || d.settings.tone))
 })
 
-app.post('/api/ai/classify', async (req, res) => {
+app.post('/api/ai-classify', async (req, res) => {
   if (!req.body.text) return res.status(400).json({ error: 'text is required' })
   res.json(await classifyReply(req.body.text))
 })
 
 // Manually re-pull from Manatal.
-app.post('/api/manatal/sync', async (_req, res) => {
+app.post('/api/manatal-sync', async (_req, res) => {
   if (!hasManatalKey())
     return res.status(400).json({ error: 'no_key', reason: 'Set MANATAL_API_KEY in Vercel → Settings → Environment Variables, then redeploy.' })
   manatalState = { attempted: false, ok: false, count: 0, error: null }

@@ -135,7 +135,7 @@ export default function SendQueue() {
     if (!current || regenerating) return
     setRegenerating(true)
     try {
-      const { message, source: src } = await generateMessage(current.candidate.id, tone)
+      const { message, source: src } = await generateMessage(current.candidate, tone)
       setDraft(message.slice(0, MAX_CHARS))
       setSource(src)
       toast.success(src === 'deepseek' ? 'New message drafted' : 'New draft (local sample)')
@@ -165,7 +165,7 @@ export default function SendQueue() {
     for (let k = 0; k < targets.length; k++) {
       const q = targets[k]
       try {
-        const { message, source: src } = await generateMessage(q.candidate.id, tone)
+        const { message, source: src } = await generateMessage(q.candidate, tone)
         await updateQueueItem(q.id, { draftMessage: message })
         if (src === 'deepseek') aiCount++
         setItems((prev) => prev.map((it) => (it.id === q.id ? { ...it, draftMessage: message } : it)))

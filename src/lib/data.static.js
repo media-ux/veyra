@@ -120,8 +120,11 @@ export function getConnections() {
 }
 
 // Local mock draft/classify (mirrors server/ai.js fallbacks).
-export function generateMessage(candidateId, tone = 'warm') {
-  const c = db.candidates.find((x) => x.id === candidateId)
+export function generateMessage(candidateOrId, tone = 'warm') {
+  const c =
+    candidateOrId && typeof candidateOrId === 'object'
+      ? candidateOrId
+      : db.candidates.find((x) => x.id === candidateOrId)
   const firstName = c.name.split(' ')[0]
   const hook = c.enrichmentSummary.split('.')[0]
   const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1)

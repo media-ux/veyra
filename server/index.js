@@ -27,7 +27,7 @@ const PORT = process.env.PORT || 5174
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
 // Tells the frontend whether to show the login screen.
-app.get('/api/auth/config', (_req, res) => res.json({ authRequired: authRequired(), demo: false }))
+app.get('/api/auth-config', (_req, res) => res.json({ authRequired: authRequired(), demo: false }))
 
 // Exchange username + password for a signed token.
 app.post('/api/login', (req, res) => {
@@ -51,7 +51,7 @@ app.get('/api/connections', (_req, res) => {
 // Pull real candidates from Manatal and replace the candidate list + rebuild
 // the send queue. Requires MANATAL_API_KEY in .env. Returns a clear error if
 // the key is missing or the API call fails.
-app.post('/api/manatal/sync', async (_req, res) => {
+app.post('/api/manatal-sync', async (_req, res) => {
   if (!hasManatalKey()) {
     return res.status(400).json({ error: 'no_key', reason: 'Add MANATAL_API_KEY to .env, then restart.' })
   }
@@ -89,11 +89,12 @@ app.get('/api/accounts', (_req, res) => res.json(read().accounts))
 // --- Candidates -------------------------------------------------------------
 app.get('/api/candidates', (_req, res) => res.json(read().candidates))
 
-app.patch('/api/candidates/:id', (req, res) => {
+app.patch('/api/candidate-update', (req, res) => {
   const db = read()
-  const c = db.candidates.find((x) => x.id === req.params.id)
+  const { id, ...patch } = req.body || {}
+  const c = db.candidates.find((x) => x.id === id)
   if (!c) return res.status(404).json({ error: 'Candidate not found' })
-  Object.assign(c, req.body)
+  Object.assign(c, patch)
   write(db)
   res.json(c)
 })
@@ -103,12 +104,11 @@ app.get('/api/queue', (_req, res) => res.json(read().queue))
 
 // Update a queue item. When marking as "sent" we enforce the per-account hard
 // limits and bump that account's usage + the candidate's stage.
-app.patch('/api/queue/:id', (req, res) => {
+app.patch('/api/queue-update', (req, res) => {
   const db = read()
-  const item = db.queue.find((q) => q.id === req.params.id)
+  const { id, status, draftMessage: newDraft } = req.body || {}
+  const item = db.queue.find((q) => q.id === id)
   if (!item) return res.status(404).json({ error: 'Queue item not found' })
-
-  const { status, draftMessage: newDraft } = req.body
 
   if (typeof newDraft === 'string') item.draftMessage = newDraft
 
@@ -204,17 +204,17 @@ app.get('/api/stats', (_req, res) => {
 })
 
 // --- AI: draft a message ----------------------------------------------------
-app.post('/api/ai/message', async (req, res) => {
+app.post('/api/ai-message', async (req, res) => {
   const db = read()
-  const { candidateId, tone } = req.body
-  const candidate = db.candidates.find((c) => c.id === candidateId)
+  const { candidateId, tone, candidate: candidateBody } = req.body
+  const candidate = candidateBody || db.candidates.find((c) => c.id === candidateId)
   if (!candidate) return res.status(404).json({ error: 'Candidate not found' })
   const result = await draftMessage(candidate, tone || db.settings.tone)
   res.json(result)
 })
 
 // --- AI: classify a reply ---------------------------------------------------
-app.post('/api/ai/classify', async (req, res) => {
+app.post('/api/ai-classify', async (req, res) => {
   const { text, candidateId } = req.body
   if (!text) return res.status(400).json({ error: 'text is required' })
   const result = await classifyReply(text)
