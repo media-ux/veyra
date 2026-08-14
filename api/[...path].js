@@ -49,6 +49,9 @@ async function ensureManatal() {
         status: 'pending',
         sentAt: null,
       }))
+      // Demo replies point at demo candidates that no longer exist — clear them
+      // so the dashboard doesn't show "Unknown" replies.
+      d.replies = []
       manatalState.ok = true
       manatalState.count = pulled.length
     } else {

@@ -89,6 +89,8 @@ app.post('/api/manatal-sync', async (_req, res) => {
       status: 'pending',
       sentAt: null,
     }))
+    // Demo replies reference demo candidates — clear so no "Unknown" shows.
+    db.replies = []
     write(db)
     res.json({ ok: true, count: candidates.length })
   } catch (err) {

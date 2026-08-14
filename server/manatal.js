@@ -66,12 +66,53 @@ export async function fetchCandidateDetail(manatalId) {
   const resume =
     documents.find((d) => /resume|cv|curriculum|résumé/i.test(d.name)) || documents[0] || null
 
+  const pick = (...vals) => vals.find((v) => v != null && v !== '') || ''
+  const flat = (v) => (Array.isArray(v) ? v[0] : v)
+  const contactVal = (v) => {
+    const first = flat(v)
+    if (!first) return ''
+    return typeof first === 'string' ? first : first.email || first.phone || first.value || ''
+  }
+
+  const description = pick(detail.description, detail.summary, detail.about, detail.bio, detail.notes)
+  const email = pick(contactVal(detail.email_addresses), detail.email, contactVal(detail.emails))
+  const phone = pick(contactVal(detail.phone_numbers), detail.phone, contactVal(detail.phones))
+  const currentPosition = pick(detail.current_position, detail.job_title, mapped.headline)
+  const source = pick(detail.source, detail.candidate_source)
+
+  const mapHistory = (rows, titleKeys, orgKeys) =>
+    (rows || [])
+      .map((e) => ({
+        title: pick(...titleKeys.map((k) => e[k])),
+        org: pick(...orgKeys.map((k) => e[k])),
+        period: [e.start_date, e.end_date].filter(Boolean).join(' – '),
+      }))
+      .filter((x) => x.title || x.org)
+
+  const experience = mapHistory(
+    detail.experiences || detail.work_experience || detail.experience,
+    ['position', 'title', 'job_title'],
+    ['company_name', 'company', 'organization'],
+  )
+  const education = mapHistory(
+    detail.education || detail.educations,
+    ['degree', 'field_of_study', 'title'],
+    ['school_name', 'school', 'institution', 'organization'],
+  )
+
   return {
     ...mapped,
     manatalId: String(detail.id ?? manatalId),
     documents,
     resumeUrl: resume?.url || detail.resume || detail.cv || null,
     appliedFor,
+    description,
+    email,
+    phone,
+    currentPosition,
+    source,
+    experience,
+    education,
   }
 }
 
@@ -111,9 +152,10 @@ function mapCandidate(c) {
     (c.social_media && c.social_media.linkedin) ||
     (name ? `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(name)}` : '')
   const skills = (c.skills || [])
-    .map((s) => (typeof s === 'string' ? s : s.name || s.skill))
-    .filter(Boolean)
-    .slice(0, 3)
+    .map((s) => (typeof s === 'string' ? s : s.name || s.skill || ''))
+    // Drop bare ids/numbers — only keep skills that actually contain letters.
+    .filter((s) => s && /[a-zA-Z]/.test(String(s)))
+    .slice(0, 6)
   const summary =
     c.summary || c.description || c.about || headline || 'Profile synced from Manatal.'
 

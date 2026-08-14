@@ -187,14 +187,17 @@ export default function Dashboard({ onNavigate }) {
               <Skeleton key={i} className="h-16 w-full" />
             ))}
           </div>
-        ) : replies.length === 0 ? (
+        ) : replies.filter((r) => candidates.find((x) => x.id === r.candidateId)).length === 0 ? (
           <p className="text-sm text-slate-500">No replies yet.</p>
         ) : (
           <div className="grid gap-3 md:grid-cols-3">
-            {replies.slice(0, 3).map((r, i) => {
-              const c = candidates.find((x) => x.id === r.candidateId)
-              const meta = classificationMeta(r.classification)
-              return (
+            {replies
+              .filter((r) => candidates.find((x) => x.id === r.candidateId))
+              .slice(0, 3)
+              .map((r, i) => {
+                const c = candidates.find((x) => x.id === r.candidateId)
+                const meta = classificationMeta(r.classification)
+                return (
                 <motion.div
                   key={r.id}
                   initial={{ opacity: 0, y: 10 }}

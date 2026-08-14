@@ -10,6 +10,8 @@ import {
   Download,
   Briefcase,
   Loader2,
+  Mail,
+  Phone,
 } from 'lucide-react'
 import Avatar from './Avatar.jsx'
 import { getCandidateDetail } from '../lib/data.js'
@@ -134,6 +136,48 @@ export default function CandidateModal({ candidate, onClose }) {
                 </div>
               )}
 
+              {/* Full description, when Manatal has one distinct from the summary */}
+              {c.description && c.description !== c.enrichmentSummary && (
+                <div className="mt-5">
+                  <p className="label mb-2">Description</p>
+                  <p className="whitespace-pre-line text-[15px] leading-relaxed text-slate-700">
+                    {c.description}
+                  </p>
+                </div>
+              )}
+
+              {c.experience?.length > 0 && (
+                <div className="mt-5">
+                  <p className="label mb-2">Experience</p>
+                  <History items={c.experience} />
+                </div>
+              )}
+
+              {c.education?.length > 0 && (
+                <div className="mt-5">
+                  <p className="label mb-2">Education</p>
+                  <History items={c.education} />
+                </div>
+              )}
+
+              {(c.email || c.phone) && (
+                <div className="mt-5">
+                  <p className="label mb-2">Contact</p>
+                  <div className="flex flex-col gap-1.5 text-sm text-slate-700">
+                    {c.email && (
+                      <a href={`mailto:${c.email}`} className="inline-flex items-center gap-2 hover:text-amber-600">
+                        <Mail size={14} className="text-slate-500" /> {c.email}
+                      </a>
+                    )}
+                    {c.phone && (
+                      <span className="inline-flex items-center gap-2">
+                        <Phone size={14} className="text-slate-500" /> {c.phone}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="mt-5 flex flex-wrap gap-2">
                 {c.profileUrl && (
                   <a href={c.profileUrl} target="_blank" rel="noopener noreferrer" className="btn-ghost">
@@ -237,5 +281,19 @@ function Meta({ icon: Icon, text }) {
     <span className="chip bg-black/[0.04] text-slate-600">
       <Icon size={13} className="text-slate-500" /> {text}
     </span>
+  )
+}
+
+function History({ items }) {
+  return (
+    <div className="space-y-2.5">
+      {items.map((it, i) => (
+        <div key={i} className="rounded-xl border border-black/[0.06] bg-cream p-3">
+          {it.title && <p className="text-sm font-semibold text-ink">{it.title}</p>}
+          {it.org && <p className="text-xs text-slate-600">{it.org}</p>}
+          {it.period && <p className="mt-0.5 text-[11px] text-slate-500">{it.period}</p>}
+        </div>
+      ))}
+    </div>
   )
 }
