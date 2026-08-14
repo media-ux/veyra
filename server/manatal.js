@@ -34,6 +34,23 @@ export async function fetchCandidateDetail(manatalId) {
 
   const detail = await manatalGet(`/candidates/${id}/`)
 
+  // Diagnostic (field names only, no personal data) so we can map Manatal's
+  // actual schema precisely instead of guessing.
+  try {
+    console.log(
+      '[candidate-detail] fields:',
+      JSON.stringify({
+        keys: Object.keys(detail),
+        hasDescription: Boolean(detail.description || detail.summary || detail.about || detail.bio),
+        experienceKey: ['experiences', 'work_experience', 'experience'].find((k) => detail[k]),
+        educationKey: ['education', 'educations'].find((k) => detail[k]),
+        emailKey: ['email_addresses', 'email', 'emails'].find((k) => detail[k]),
+      }),
+    )
+  } catch {
+    /* logging must never break the request */
+  }
+
   let documents = []
   try {
     const docs = await manatalGet(`/candidates/${id}/documents/`)
