@@ -72,15 +72,15 @@ export default function Pipeline() {
                 className={`flex w-72 shrink-0 flex-col rounded-2xl border p-3 transition-colors ${
                   isOver
                     ? 'border-accent/40 bg-accent/[0.06]'
-                    : 'border-white/5 bg-white/[0.02]'
+                    : 'border-black/5 bg-black/[0.02]'
                 }`}
               >
                 <div className="mb-3 flex items-center justify-between px-1">
                   <div className="flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full" style={{ background: stage.color }} />
-                    <h3 className="text-sm font-semibold text-slate-200">{stage.label}</h3>
+                    <h3 className="text-sm font-semibold text-slate-700">{stage.label}</h3>
                   </div>
-                  <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-xs font-semibold text-slate-400">
+                  <span className="rounded-full bg-black/[0.06] px-2 py-0.5 text-xs font-semibold text-slate-500">
                     {cards.length}
                   </span>
                 </div>
@@ -103,13 +103,13 @@ export default function Pipeline() {
                           setDraggingId(c.id)
                         }}
                         onDragEnd={() => setDraggingId(null)}
-                        className="group cursor-grab rounded-xl border border-white/5 bg-base-600/80 p-3 active:cursor-grabbing"
+                        className="group cursor-grab rounded-xl border border-black/5 bg-base-600/80 p-3 active:cursor-grabbing"
                       >
                         <div className="flex items-start gap-2.5">
                           <Avatar name={c.name} photoUrl={c.photoUrl} size={36} />
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold text-white">{c.name}</p>
-                            <p className="truncate text-xs text-slate-400">{c.headline}</p>
+                            <p className="truncate text-sm font-semibold text-ink">{c.name}</p>
+                            <p className="truncate text-xs text-slate-500">{c.headline}</p>
                           </div>
                           <GripVertical
                             size={15}

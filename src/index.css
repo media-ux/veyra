@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html,
@@ -13,47 +13,52 @@ body,
 }
 
 body {
-  @apply bg-base-800 text-slate-200 font-sans antialiased;
+  @apply bg-paper text-ink font-sans antialiased;
   background-image:
-    radial-gradient(60rem 40rem at 15% -10%, rgba(61, 107, 255, 0.10), transparent 60%),
-    radial-gradient(50rem 40rem at 100% 0%, rgba(91, 140, 255, 0.08), transparent 55%);
+    radial-gradient(55rem 40rem at 100% -10%, rgba(245, 194, 75, 0.18), transparent 60%),
+    radial-gradient(50rem 40rem at -10% 0%, rgba(245, 194, 75, 0.10), transparent 55%);
   background-attachment: fixed;
 }
 
-/* Thin, subtle scrollbars that fit the dark theme */
+/* Soft, light scrollbars */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-base-500 rounded-full;
+  @apply bg-black/10 rounded-full;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 
 @layer components {
-  /* Glassmorphism card — the signature surface used across the app */
+  /* The signature soft, rounded card surface used across the app. */
   .glass {
-    @apply rounded-2xl border border-white/5 bg-white/[0.03] backdrop-blur-xl shadow-card;
+    @apply rounded-3xl border border-black/[0.06] bg-surface shadow-card;
   }
 
   .glass-hover {
-    @apply transition-colors hover:border-white/10 hover:bg-white/[0.05];
+    @apply transition-colors hover:border-black/10 hover:bg-cream;
   }
 
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold
            transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 disabled:opacity-40 disabled:cursor-not-allowed;
   }
+  /* Primary = dark "pill" (like the reference's black buttons). */
   .btn-primary {
-    @apply btn bg-accent text-white shadow-glow hover:bg-accent-soft;
+    @apply btn bg-ink text-white hover:bg-ink-700 shadow-soft;
+  }
+  /* Accent = the soft yellow, for highlight actions. */
+  .btn-accent {
+    @apply btn bg-accent text-ink hover:bg-accent-deep shadow-glow;
   }
   .btn-ghost {
-    @apply btn bg-white/[0.04] text-slate-200 hover:bg-white/[0.08] border border-white/5;
+    @apply btn bg-white text-ink border border-black/[0.08] hover:bg-cream;
   }
   .btn-danger {
-    @apply btn bg-bad/15 text-bad hover:bg-bad/25 border border-bad/20;
+    @apply btn bg-bad/10 text-bad hover:bg-bad/15 border border-bad/20;
   }
 
   .label {
@@ -65,7 +70,7 @@ body {
   }
 }
 
-/* Soft gradient glow you can drop behind a big number */
+/* Big numbers sit on a soft yellow halo instead of a glow. */
 .glow-text {
-  text-shadow: 0 0 28px rgba(91, 140, 255, 0.55);
+  text-shadow: none;
 }

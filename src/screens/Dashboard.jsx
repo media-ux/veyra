@@ -76,12 +76,12 @@ export default function Dashboard({ onNavigate }) {
                 <div className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-accent/20 blur-2xl transition-opacity group-hover:opacity-80" />
                 <div className="relative flex items-center justify-between">
                   <p className="label">{k.label}</p>
-                  <Icon size={18} className="text-accent/80" />
+                  <Icon size={18} className="text-amber-600/80" />
                 </div>
                 <CountUp
                   value={k.value}
                   suffix={k.suffix}
-                  className="glow-text relative mt-3 block text-4xl font-extrabold tracking-tight text-white"
+                  className="glow-text relative mt-3 block text-4xl font-extrabold tracking-tight text-ink"
                 />
               </motion.div>
             )
@@ -99,7 +99,7 @@ export default function Dashboard({ onNavigate }) {
         >
           <div className="mb-5 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-semibold text-white">7-day activity</h2>
+              <h2 className="text-base font-semibold text-ink">7-day activity</h2>
               <p className="text-xs text-slate-500">Invites, acceptances and replies</p>
             </div>
           </div>
@@ -113,10 +113,10 @@ export default function Dashboard({ onNavigate }) {
           className="glass p-6"
         >
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-white">Candidates by stage</h2>
+            <h2 className="text-base font-semibold text-ink">Candidates by stage</h2>
             <button
               onClick={() => onNavigate('pipeline')}
-              className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent-soft"
+              className="flex items-center gap-1 text-xs font-medium text-amber-600 hover:text-amber-700"
             >
               Pipeline <ArrowRight size={13} />
             </button>
@@ -142,12 +142,12 @@ export default function Dashboard({ onNavigate }) {
       >
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-white">Weekly quota per account</h2>
+            <h2 className="text-base font-semibold text-ink">Weekly quota per account</h2>
             <p className="text-xs text-slate-500">Invites used out of 100 this week</p>
           </div>
           <button
             onClick={() => onNavigate('health')}
-            className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent-soft"
+            className="flex items-center gap-1 text-xs font-medium text-amber-600 hover:text-amber-700"
           >
             Account health <ArrowRight size={13} />
           </button>
@@ -180,7 +180,7 @@ export default function Dashboard({ onNavigate }) {
         transition={{ delay: 0.44, type: 'spring', stiffness: 120, damping: 18 }}
         className="glass mt-6 p-6"
       >
-        <h2 className="mb-4 text-base font-semibold text-white">Recent replies</h2>
+        <h2 className="mb-4 text-base font-semibold text-ink">Recent replies</h2>
         {loading ? (
           <div className="space-y-3">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -201,12 +201,12 @@ export default function Dashboard({ onNavigate }) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 + i * 0.06 }}
                   whileHover={{ y: -3 }}
-                  className="rounded-xl border border-white/5 bg-white/[0.02] p-4"
+                  className="rounded-xl border border-black/5 bg-black/[0.02] p-4"
                 >
                   <div className="flex items-center gap-3">
                     <Avatar name={c?.name || 'Unknown'} photoUrl={c?.photoUrl} size={40} />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-white">
+                      <p className="truncate text-sm font-semibold text-ink">
                         {c?.name || 'Unknown'}
                       </p>
                       <p className="text-[11px] text-slate-500">{relativeTime(r.receivedAt)}</p>
@@ -218,7 +218,7 @@ export default function Dashboard({ onNavigate }) {
                       {meta.label}
                     </span>
                   </div>
-                  <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-slate-400">
+                  <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-slate-500">
                     "{r.text}"
                   </p>
                 </motion.div>
@@ -239,8 +239,8 @@ function StageBars({ byStage }) {
         const count = byStage[s.key] || 0
         return (
           <div key={s.key} className="flex items-center gap-3">
-            <span className="w-20 text-xs text-slate-400">{s.label}</span>
-            <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-white/[0.05]">
+            <span className="w-20 text-xs text-slate-500">{s.label}</span>
+            <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-black/[0.05]">
               <motion.div
                 className="h-full rounded-full"
                 style={{ background: s.color }}
@@ -249,7 +249,7 @@ function StageBars({ byStage }) {
                 transition={{ delay: 0.3 + i * 0.05, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               />
             </div>
-            <span className="w-6 text-right text-xs font-semibold text-slate-200">{count}</span>
+            <span className="w-6 text-right text-xs font-semibold text-slate-700">{count}</span>
           </div>
         )
       })}

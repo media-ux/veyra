@@ -9,7 +9,7 @@ export default function PageHeader({ title, subtitle, actions }) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="text-2xl font-bold tracking-tight text-white sm:text-3xl"
+          className="text-2xl font-bold tracking-tight text-ink sm:text-3xl"
         >
           {title}
         </motion.h1>
@@ -18,7 +18,7 @@ export default function PageHeader({ title, subtitle, actions }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-1.5 text-sm text-slate-400"
+            className="mt-1.5 text-sm text-slate-500"
           >
             {subtitle}
           </motion.p>

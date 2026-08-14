@@ -223,7 +223,7 @@ export default function SendQueue() {
               disabled={!!drafting || !items || items.length - index === 0}
               className="btn-ghost"
             >
-              <Sparkles size={15} className={drafting ? 'animate-pulse text-accent' : 'text-accent'} />
+              <Sparkles size={15} className={drafting ? 'animate-pulse text-amber-600' : 'text-amber-600'} />
               {drafting ? `Drafting ${drafting.done}/${drafting.total}…` : 'Draft all with AI'}
             </button>
             <ToneSelector tone={tone} onChange={setTone} />
@@ -317,8 +317,8 @@ function UpNext({ items }) {
           >
             <Avatar name={q.candidate.name} photoUrl={q.candidate.photoUrl} size={40} />
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-white">{q.candidate.name}</p>
-              <p className="truncate text-xs text-slate-400">{q.candidate.company}</p>
+              <p className="truncate text-sm font-semibold text-ink">{q.candidate.name}</p>
+              <p className="truncate text-xs text-slate-500">{q.candidate.company}</p>
             </div>
             <span
               className="ml-auto text-sm font-bold"
@@ -338,12 +338,12 @@ function DailyProgress({ account, target, sent, remaining }) {
   return (
     <div className="glass p-4">
       <div className="mb-2 flex items-center justify-between text-xs">
-        <span className="font-medium text-slate-300">
+        <span className="font-medium text-slate-600">
           {account?.name} · {sent}/{target} sent today
         </span>
         <span className="text-slate-500">{remaining} left in queue</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
+      <div className="h-2 overflow-hidden rounded-full bg-black/[0.06]">
         <motion.div
           className="h-full rounded-full bg-gradient-to-r from-accent-glow to-accent-soft"
           initial={{ width: 0 }}
@@ -375,8 +375,8 @@ function ProfilePanel({ candidate, account }) {
               className="ring-4 ring-base-700"
             />
             <div className="pb-1">
-              <h2 className="text-xl font-bold text-white">{candidate.name}</h2>
-              <p className="text-sm text-slate-400">{candidate.headline}</p>
+              <h2 className="text-xl font-bold text-ink">{candidate.name}</h2>
+              <p className="text-sm text-slate-500">{candidate.headline}</p>
             </div>
           </div>
           <MatchScore score={candidate.matchScore} />
@@ -392,7 +392,7 @@ function ProfilePanel({ candidate, account }) {
             {candidate.skills.map((s) => (
               <span
                 key={s}
-                className="chip border border-accent/20 bg-accent/10 font-medium text-accent-soft"
+                className="chip border border-accent/20 bg-accent/10 font-medium text-amber-700"
               >
                 {s}
               </span>
@@ -402,16 +402,16 @@ function ProfilePanel({ candidate, account }) {
 
         <div className="mt-6">
           <p className="label mb-2 flex items-center gap-1.5">
-            <Sparkles size={12} className="text-accent" /> Enriched profile summary
+            <Sparkles size={12} className="text-amber-600" /> Enriched profile summary
           </p>
-          <p className="text-[15px] leading-relaxed text-slate-200">
+          <p className="text-[15px] leading-relaxed text-slate-700">
             {candidate.enrichmentSummary}
           </p>
         </div>
 
-        <div className="mt-6 flex items-center gap-2 border-t border-white/5 pt-4 text-xs text-slate-500">
-          <span className="chip bg-white/[0.05] text-slate-300">Manatal · {candidate.manatalId}</span>
-          <span className="chip bg-white/[0.05] text-slate-300">Account · {account.name}</span>
+        <div className="mt-6 flex items-center gap-2 border-t border-black/5 pt-4 text-xs text-slate-500">
+          <span className="chip bg-black/[0.05] text-slate-600">Manatal · {candidate.manatalId}</span>
+          <span className="chip bg-black/[0.05] text-slate-600">Account · {account.name}</span>
         </div>
       </div>
     </div>
@@ -439,7 +439,7 @@ function MatchScore({ score }) {
 
 function Meta({ icon: Icon, text }) {
   return (
-    <span className="chip bg-white/[0.04] text-slate-300">
+    <span className="chip bg-black/[0.04] text-slate-600">
       <Icon size={13} className="text-slate-500" /> {text}
     </span>
   )
@@ -466,15 +466,15 @@ function MessagePanel({
     <div className="glass flex flex-col p-6 sm:p-8">
       <div className="mb-3 flex items-center justify-between gap-2">
         <p className="label flex items-center gap-1.5">
-          <Sparkles size={12} className="text-accent" /> AI-drafted connection note
+          <Sparkles size={12} className="text-amber-600" /> AI-drafted connection note
         </p>
         <div className="flex items-center gap-2">
           {source && (
             <span
               className={`chip font-semibold ${
                 source === 'deepseek'
-                  ? 'bg-accent/15 text-accent-soft'
-                  : 'bg-white/[0.05] text-slate-400'
+                  ? 'bg-accent/15 text-amber-700'
+                  : 'bg-black/[0.05] text-slate-500'
               }`}
               title={
                 source === 'deepseek'
@@ -500,12 +500,12 @@ function MessagePanel({
           value={draft}
           maxLength={MAX_CHARS}
           onChange={(e) => setDraft(e.target.value)}
-          className="h-48 w-full resize-none rounded-xl border border-white/5 bg-base-900/50 p-4 text-[15px] leading-relaxed text-slate-100 outline-none transition-colors focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
+          className="h-48 w-full resize-none rounded-xl border border-black/5 bg-black/[0.03] p-4 text-[15px] leading-relaxed text-slate-800 outline-none transition-colors focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
           placeholder="Your personalised message…"
         />
         {regenerating && (
           <div className="absolute inset-0 grid place-items-center rounded-xl bg-base-900/70 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-sm text-accent">
+            <div className="flex items-center gap-2 text-sm text-amber-600">
               <RefreshCw size={16} className="animate-spin" /> Drafting…
             </div>
           </div>
@@ -531,7 +531,7 @@ function MessagePanel({
         </button>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
-        <button onClick={onSkip} disabled={busy} className="btn-ghost text-slate-400">
+        <button onClick={onSkip} disabled={busy} className="btn-ghost text-slate-500">
           <SkipForward size={16} /> Skip <Kbd>K</Kbd>
         </button>
         <button onClick={onSend} disabled={busy || blocked} className="btn-primary">
@@ -545,13 +545,13 @@ function MessagePanel({
 function ToneSelector({ tone, onChange }) {
   const tones = ['direct', 'warm', 'technical']
   return (
-    <div className="flex rounded-xl border border-white/5 bg-white/[0.03] p-1">
+    <div className="flex rounded-xl border border-black/5 bg-black/[0.03] p-1">
       {tones.map((t) => (
         <button
           key={t}
           onClick={() => onChange(t)}
           className={`relative rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${
-            tone === t ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+            tone === t ? 'text-ink' : 'text-slate-500 hover:text-slate-700'
           }`}
         >
           {tone === t && (
@@ -572,7 +572,7 @@ function Kbd({ children, light }) {
   return (
     <kbd
       className={`ml-1 hidden rounded border px-1.5 py-0.5 text-[10px] font-bold sm:inline ${
-        light ? 'border-white/30 text-white/80' : 'border-white/10 text-slate-500'
+        light ? 'border-white/30 text-white/80' : 'border-black/10 text-slate-500'
       }`}
     >
       {children}
@@ -585,8 +585,8 @@ function ShortcutHint() {
     <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-600">
       <Keyboard size={14} />
       <span>
-        <b className="text-slate-400">S</b> send · <b className="text-slate-400">K</b> skip ·{' '}
-        <b className="text-slate-400">R</b> regenerate
+        <b className="text-slate-500">S</b> send · <b className="text-slate-500">K</b> skip ·{' '}
+        <b className="text-slate-500">R</b> regenerate
       </span>
     </div>
   )
@@ -604,8 +604,8 @@ function EmptyState({ total }) {
       <div className="grid h-16 w-16 place-items-center rounded-2xl bg-good/15 text-good ring-1 ring-good/30">
         <PartyPopper size={28} />
       </div>
-      <h2 className="mt-5 text-xl font-bold text-white">Queue cleared</h2>
-      <p className="mt-2 max-w-sm text-sm text-slate-400">
+      <h2 className="mt-5 text-xl font-bold text-ink">Queue cleared</h2>
+      <p className="mt-2 max-w-sm text-sm text-slate-500">
         You worked through {total} candidate{total === 1 ? '' : 's'}. New candidates will appear
         here as they are sourced from Manatal.
       </p>

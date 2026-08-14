@@ -15,7 +15,7 @@ export default function Avatar({ name = '', photoUrl, size = 56, className = '' 
         alt={name}
         width={size}
         height={size}
-        className={`shrink-0 rounded-2xl object-cover ring-1 ring-white/10 ${className}`}
+        className={`shrink-0 rounded-2xl object-cover ring-1 ring-black/10 ${className}`}
         style={{ width: size, height: size }}
       />
     )

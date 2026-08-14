@@ -41,10 +41,10 @@ export default function Login({ demo, onSuccess }) {
         <div className="flex flex-col items-center text-center">
           <div className="relative grid h-14 w-14 place-items-center rounded-2xl bg-accent/15 ring-1 ring-accent/30">
             <span className="absolute inset-0 rounded-2xl bg-accent/20 blur-lg" />
-            <Send size={24} className="relative text-accent" />
+            <Send size={24} className="relative text-amber-600" />
           </div>
-          <h1 className="mt-5 text-2xl font-bold text-white">Outreach Command Center</h1>
-          <p className="mt-1.5 text-sm text-slate-400">Sign in to continue</p>
+          <h1 className="mt-5 text-2xl font-bold text-ink">Outreach Command Center</h1>
+          <p className="mt-1.5 text-sm text-slate-500">Sign in to continue</p>
         </div>
 
         <form onSubmit={submit} className="mt-8 space-y-4">
@@ -89,9 +89,9 @@ export default function Login({ demo, onSuccess }) {
         </form>
 
         {demo && (
-          <p className="mt-5 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-2 text-center text-xs text-slate-400">
-            Demo preview — sign in with <b className="text-slate-200">admin</b> /{' '}
-            <b className="text-slate-200">demo</b>
+          <p className="mt-5 rounded-lg border border-black/5 bg-black/[0.03] px-3 py-2 text-center text-xs text-slate-500">
+            Demo preview — sign in with <b className="text-slate-700">admin</b> /{' '}
+            <b className="text-slate-700">demo</b>
           </p>
         )}
       </motion.div>
@@ -114,7 +114,7 @@ function Field({ icon: Icon, label, type = 'text', value, onChange, placeholder,
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           autoFocus={autoFocus}
-          className="w-full rounded-xl border border-white/5 bg-base-900/50 py-3 pl-10 pr-4 text-sm text-slate-100 outline-none transition-colors focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
+          className="w-full rounded-xl border border-black/5 bg-black/[0.03] py-3 pl-10 pr-4 text-sm text-slate-800 outline-none transition-colors focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
         />
       </div>
     </label>

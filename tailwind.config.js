@@ -4,34 +4,44 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Deep navy / near-black base
+        // Warm, light "paper" palette with a soft yellow accent.
+        paper: '#F4F0E7', // page background
+        cream: '#FBF8F1', // secondary surface
+        surface: '#FFFFFF', // cards
+        ink: { DEFAULT: '#1C1C1E', 700: '#2A2A2E' }, // near-black (text, dark buttons)
+        // The old dark-theme token names are remapped to light values so every
+        // existing bg-base-* / ring-base-* usage becomes light automatically.
         base: {
-          900: '#05070f', // near black
-          800: '#0a0e1a', // page background
-          700: '#0f1424', // panel background
-          600: '#161c30', // raised card
-          500: '#1e2740', // borders / hover
+          900: '#FFFFFF',
+          800: '#F4F0E7',
+          700: '#FFFFFF',
+          600: '#FFFFFF',
+          500: '#E7E1D4',
         },
-        // Single electric accent
         accent: {
-          DEFAULT: '#5b8cff',
-          soft: '#7aa2ff',
-          glow: '#3d6bff',
+          DEFAULT: '#F5C24B', // soft mustard yellow
+          soft: '#FBE7A8',
+          glow: '#F5C24B',
+          deep: '#E0A32B',
         },
-        good: '#34d399',
-        warn: '#fbbf24',
-        bad: '#f87171',
+        good: '#16a34a',
+        warn: '#d97706',
+        bad: '#dc2626',
       },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
+      borderRadius: {
+        '4xl': '2rem',
+      },
       boxShadow: {
-        glow: '0 0 40px -8px rgba(91, 140, 255, 0.45)',
-        card: '0 8px 30px -12px rgba(0, 0, 0, 0.6)',
+        glow: '0 10px 30px -8px rgba(245, 194, 75, 0.55)',
+        card: '0 12px 32px -16px rgba(28, 28, 30, 0.18)',
+        soft: '0 2px 10px -4px rgba(28, 28, 30, 0.10)',
       },
       backgroundImage: {
         'accent-glow':
-          'radial-gradient(circle at 50% 0%, rgba(91,140,255,0.18), transparent 70%)',
+          'radial-gradient(circle at 50% 0%, rgba(245,194,75,0.28), transparent 70%)',
       },
     },
   },

@@ -38,7 +38,7 @@ export default function Layout({ current, onNavigate, onLogout, children }) {
               onClick?.()
             }}
             className={`group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
-              active ? 'text-white' : 'text-slate-400 hover:text-slate-100'
+              active ? 'text-ink' : 'text-slate-500 hover:text-slate-800'
             }`}
           >
             {active && (
@@ -48,7 +48,7 @@ export default function Layout({ current, onNavigate, onLogout, children }) {
                 transition={{ type: 'spring', stiffness: 500, damping: 34 }}
               />
             )}
-            <Icon size={18} className={`relative z-10 ${active ? 'text-accent' : ''}`} />
+            <Icon size={18} className={`relative z-10 ${active ? 'text-amber-600' : ''}`} />
             <span className="relative z-10">{item.label}</span>
           </button>
         )
@@ -60,7 +60,7 @@ export default function Layout({ current, onNavigate, onLogout, children }) {
     <div className="flex min-h-screen">
       <AuroraBackground />
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-white/5 bg-base-900/60 p-5 backdrop-blur-xl lg:flex">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-black/5 bg-base-900/60 p-5 backdrop-blur-xl lg:flex">
         <Brand />
         <div className="mt-8">
           <NavList />
@@ -69,11 +69,11 @@ export default function Layout({ current, onNavigate, onLogout, children }) {
       </aside>
 
       {/* Mobile top bar */}
-      <div className="fixed inset-x-0 top-0 z-40 flex items-center justify-between border-b border-white/5 bg-base-900/80 px-4 py-3 backdrop-blur-xl lg:hidden">
+      <div className="fixed inset-x-0 top-0 z-40 flex items-center justify-between border-b border-black/5 bg-base-900/80 px-4 py-3 backdrop-blur-xl lg:hidden">
         <Brand compact />
         <button
           onClick={() => setMobileOpen(true)}
-          className="rounded-lg p-2 text-slate-300 hover:bg-white/5"
+          className="rounded-lg p-2 text-slate-600 hover:bg-black/5"
         >
           <Menu size={20} />
         </button>
@@ -91,7 +91,7 @@ export default function Layout({ current, onNavigate, onLogout, children }) {
               onClick={() => setMobileOpen(false)}
             />
             <motion.aside
-              className="fixed inset-y-0 left-0 z-50 w-72 border-r border-white/10 bg-base-900 p-5 lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 w-72 border-r border-black/10 bg-base-900 p-5 lg:hidden"
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
@@ -101,7 +101,7 @@ export default function Layout({ current, onNavigate, onLogout, children }) {
                 <Brand />
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-lg p-2 text-slate-300 hover:bg-white/5"
+                  className="rounded-lg p-2 text-slate-600 hover:bg-black/5"
                 >
                   <X size={20} />
                 </button>
@@ -127,15 +127,15 @@ function Brand({ compact }) {
     <div className="flex items-center gap-3">
       <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-accent/15 ring-1 ring-accent/30">
         <span className="absolute inset-0 rounded-xl bg-accent/20 blur-md" />
-        <Send size={17} className="relative text-accent" />
+        <Send size={17} className="relative text-amber-600" />
       </div>
       {!compact && (
         <div className="leading-tight">
-          <p className="text-sm font-bold text-white">Outreach</p>
+          <p className="text-sm font-bold text-ink">Outreach</p>
           <p className="text-[11px] font-medium text-slate-500">Command Center</p>
         </div>
       )}
-      {compact && <p className="text-sm font-bold text-white">Outreach CC</p>}
+      {compact && <p className="text-sm font-bold text-ink">Outreach CC</p>}
     </div>
   )
 }
@@ -146,13 +146,13 @@ function Footer({ onLogout }) {
       {onLogout && (
         <button
           onClick={onLogout}
-          className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:bg-white/[0.05] hover:text-slate-100"
+          className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-500 transition-colors hover:bg-black/[0.05] hover:text-slate-800"
         >
           <LogOut size={18} /> Sign out
         </button>
       )}
       <div className="glass p-3">
-        <p className="text-[11px] font-semibold text-slate-300">EX Venture</p>
+        <p className="text-[11px] font-semibold text-slate-600">EX Venture</p>
         <p className="mt-0.5 text-[11px] text-slate-500">Recruiting outreach · human-sent</p>
       </div>
     </div>

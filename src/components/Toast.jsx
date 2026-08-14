@@ -14,7 +14,7 @@ const ICONS = {
 const ACCENTS = {
   success: 'text-good',
   error: 'text-bad',
-  info: 'text-accent',
+  info: 'text-amber-600',
 }
 
 export function ToastProvider({ children }) {
@@ -57,10 +57,10 @@ export function ToastProvider({ children }) {
                 className="glass pointer-events-auto flex items-start gap-3 p-4"
               >
                 <Icon size={18} className={`mt-0.5 shrink-0 ${ACCENTS[t.type]}`} />
-                <p className="flex-1 text-sm text-slate-100">{t.message}</p>
+                <p className="flex-1 text-sm text-slate-800">{t.message}</p>
                 <button
                   onClick={() => remove(t.id)}
-                  className="text-slate-500 transition-colors hover:text-slate-200"
+                  className="text-slate-500 transition-colors hover:text-slate-700"
                 >
                   <X size={16} />
                 </button>

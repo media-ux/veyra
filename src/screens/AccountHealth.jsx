@@ -70,12 +70,12 @@ function AccountCard({ account, index }) {
       />
       <div className="relative flex items-start justify-between">
         <div>
-          <h2 className="text-lg font-bold text-white">{account.name}</h2>
+          <h2 className="text-lg font-bold text-ink">{account.name}</h2>
           <a
             href={account.linkedinProfileUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-1 inline-flex items-center gap-1 text-xs text-slate-500 hover:text-accent"
+            className="mt-1 inline-flex items-center gap-1 text-xs text-slate-500 hover:text-amber-600"
           >
             LinkedIn profile <ExternalLink size={11} />
           </a>
@@ -121,13 +121,13 @@ function UsageBar({ label, used, max, pct }) {
   return (
     <div>
       <div className="mb-1.5 flex items-center justify-between text-xs">
-        <span className="font-medium text-slate-300">{label}</span>
-        <span className="tabular-nums text-slate-400">
+        <span className="font-medium text-slate-600">{label}</span>
+        <span className="tabular-nums text-slate-500">
           {used}
           <span className="text-slate-600"> / {max}</span>
         </span>
       </div>
-      <div className="h-2.5 overflow-hidden rounded-full bg-white/[0.06]">
+      <div className="h-2.5 overflow-hidden rounded-full bg-black/[0.06]">
         <motion.div
           className="h-full rounded-full"
           style={{ background: color, boxShadow: `0 0 10px ${color}66` }}

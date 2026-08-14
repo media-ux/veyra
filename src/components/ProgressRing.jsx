@@ -27,7 +27,7 @@ export default function ProgressRing({
             fill="none"
             stroke="currentColor"
             strokeWidth={stroke}
-            className="text-white/[0.06]"
+            className="text-ink/[0.06]"
           />
           <motion.circle
             cx={size / 2}
@@ -45,11 +45,11 @@ export default function ProgressRing({
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-lg font-bold text-white">{Math.round(pct)}%</span>
+          <span className="text-lg font-bold text-ink">{Math.round(pct)}%</span>
           {sublabel && <span className="text-[10px] text-slate-500">{sublabel}</span>}
         </div>
       </div>
-      {label && <span className="text-sm font-medium text-slate-300">{label}</span>}
+      {label && <span className="text-sm font-medium text-slate-600">{label}</span>}
     </div>
   )
 }

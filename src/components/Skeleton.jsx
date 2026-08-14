@@ -1,7 +1,7 @@
 // Skeleton loaders shown while data.js fetches. The shimmer is a moving
 // gradient handled purely in CSS via Tailwind's animate-pulse.
 export function Skeleton({ className = '' }) {
-  return <div className={`animate-pulse rounded-xl bg-white/[0.05] ${className}`} />
+  return <div className={`animate-pulse rounded-xl bg-black/[0.05] ${className}`} />
 }
 
 export function KpiSkeleton() {

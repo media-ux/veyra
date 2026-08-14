@@ -91,7 +91,7 @@ export default function Settings() {
         {/* Connections */}
         <Section icon={Plug} title="Connections" delay={0}>
           <p className="mb-4 text-xs text-slate-500">
-            Keys live only in the server's <code className="text-slate-400">.env</code> file. This
+            Keys live only in the server's <code className="text-slate-500">.env</code> file. This
             just reflects whether they are set.
           </p>
           <div className="space-y-3">
@@ -111,8 +111,8 @@ export default function Settings() {
                 onClick={() => update({ tone: t })}
                 className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-semibold capitalize transition-colors ${
                   settings.tone === t
-                    ? 'border-accent/40 bg-accent/15 text-white'
-                    : 'border-white/5 bg-white/[0.03] text-slate-400 hover:text-slate-200'
+                    ? 'border-accent/40 bg-accent/15 text-ink'
+                    : 'border-black/5 bg-black/[0.03] text-slate-500 hover:text-slate-700'
                 }`}
               >
                 {t}
@@ -132,7 +132,7 @@ export default function Settings() {
               onChange={(e) => update({ dailyTargetPerAccount: Number(e.target.value) })}
               className="flex-1 accent-accent"
             />
-            <span className="w-10 text-center text-lg font-bold text-white">
+            <span className="w-10 text-center text-lg font-bold text-ink">
               {settings.dailyTargetPerAccount}
             </span>
           </div>
@@ -144,18 +144,18 @@ export default function Settings() {
         {/* Templates */}
         <Section icon={MessageSquareText} title="Message templates" delay={0.1} className="lg:col-span-2">
           <p className="mb-4 text-xs text-slate-500">
-            Starting points for the AI. Use <code className="text-slate-400">{'{{firstName}}'}</code>,{' '}
-            <code className="text-slate-400">{'{{company}}'}</code> and{' '}
-            <code className="text-slate-400">{'{{hook}}'}</code> as placeholders.
+            Starting points for the AI. Use <code className="text-slate-500">{'{{firstName}}'}</code>,{' '}
+            <code className="text-slate-500">{'{{company}}'}</code> and{' '}
+            <code className="text-slate-500">{'{{hook}}'}</code> as placeholders.
           </p>
           <div className="grid gap-4 md:grid-cols-2">
             {settings.templates.map((t) => (
               <div key={t.id}>
-                <label className="mb-1.5 block text-sm font-semibold text-slate-300">{t.name}</label>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-600">{t.name}</label>
                 <textarea
                   value={t.body}
                   onChange={(e) => updateTemplate(t.id, e.target.value)}
-                  className="h-28 w-full resize-none rounded-xl border border-white/5 bg-base-900/50 p-3 text-sm text-slate-100 outline-none focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
+                  className="h-28 w-full resize-none rounded-xl border border-black/5 bg-black/[0.03] p-3 text-sm text-slate-800 outline-none focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
                 />
               </div>
             ))}
@@ -189,10 +189,10 @@ function Section({ icon: Icon, title, children, delay = 0, className = '' }) {
       className={`glass p-6 ${className}`}
     >
       <div className="mb-4 flex items-center gap-2">
-        <div className="grid h-8 w-8 place-items-center rounded-lg bg-accent/15 text-accent ring-1 ring-accent/25">
+        <div className="grid h-8 w-8 place-items-center rounded-lg bg-accent/15 text-amber-600 ring-1 ring-accent/25">
           <Icon size={15} />
         </div>
-        <h2 className="text-base font-semibold text-white">{title}</h2>
+        <h2 className="text-base font-semibold text-ink">{title}</h2>
       </div>
       {children}
     </motion.section>
@@ -221,7 +221,7 @@ function ManatalSync({ connected }) {
       </button>
       {!connected && (
         <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
-          Add <code className="text-slate-400">MANATAL_API_KEY</code> to <code className="text-slate-400">.env</code> and
+          Add <code className="text-slate-500">MANATAL_API_KEY</code> to <code className="text-slate-500">.env</code> and
           restart to enable this. In the shared preview it stays disabled (no server).
         </p>
       )}
@@ -232,8 +232,8 @@ function ManatalSync({ connected }) {
 function ConnectionRow({ name, status }) {
   const connected = status === 'connected'
   return (
-    <div className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3">
-      <span className="text-sm font-medium text-slate-200">{name}</span>
+    <div className="flex items-center justify-between rounded-xl border border-black/5 bg-black/[0.02] px-4 py-3">
+      <span className="text-sm font-medium text-slate-700">{name}</span>
       {status == null ? (
         <span className="text-xs text-slate-500">checking…</span>
       ) : connected ? (
@@ -241,7 +241,7 @@ function ConnectionRow({ name, status }) {
           <CheckCircle2 size={13} /> Connected
         </span>
       ) : (
-        <span className="chip bg-white/[0.05] font-semibold text-slate-400">
+        <span className="chip bg-black/[0.05] font-semibold text-slate-500">
           <XCircle size={13} /> Not connected
         </span>
       )}
@@ -280,7 +280,7 @@ function ReplyClassifier() {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Paste an incoming reply here…"
-        className="h-24 w-full resize-none rounded-xl border border-white/5 bg-base-900/50 p-3 text-sm text-slate-100 outline-none focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
+        className="h-24 w-full resize-none rounded-xl border border-black/5 bg-black/[0.03] p-3 text-sm text-slate-800 outline-none focus:border-accent/40 focus:ring-2 focus:ring-accent/20"
       />
       <div className="mt-3 flex items-center gap-3">
         <button onClick={run} disabled={loading || !text.trim()} className="btn-primary">

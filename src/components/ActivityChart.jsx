@@ -5,9 +5,9 @@ import { motion } from 'framer-motion'
 export default function ActivityChart({ data = [] }) {
   const max = Math.max(1, ...data.map((d) => d.invitesSent))
   const series = [
-    { key: 'invitesSent', label: 'Invites', color: '#5b8cff' },
-    { key: 'accepted', label: 'Accepted', color: '#34d399' },
-    { key: 'replies', label: 'Replies', color: '#fbbf24' },
+    { key: 'invitesSent', label: 'Invites', color: '#1C1C1E' },
+    { key: 'accepted', label: 'Accepted', color: '#F5C24B' },
+    { key: 'replies', label: 'Replies', color: '#94a3b8' },
   ]
 
   return (
@@ -40,7 +40,7 @@ export default function ActivityChart({ data = [] }) {
         {series.map((s) => (
           <div key={s.key} className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: s.color }} />
-            <span className="text-xs text-slate-400">{s.label}</span>
+            <span className="text-xs text-slate-500">{s.label}</span>
           </div>
         ))}
       </div>
