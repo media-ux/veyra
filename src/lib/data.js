@@ -203,6 +203,12 @@ export function syncFromManatal() {
   return api('/manatal-sync', { method: 'POST' })
 }
 
+// Full detail for one candidate (résumé + applied job) — pulled live from Manatal.
+export function getCandidateDetail(manatalId) {
+  // BASE44:  return base44.functions.candidateDetail({ manatalId })
+  return api('/candidate-detail', { method: 'POST', body: JSON.stringify({ manatalId }) })
+}
+
 // ---------------------------------------------------------------------------
 // DEV ONLY: reset the seed data. Remove once you are on Base44.
 // ---------------------------------------------------------------------------

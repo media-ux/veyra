@@ -11,7 +11,7 @@
 // ---------------------------------------------------------------------------
 import express from 'express'
 import { buildSeed } from '../server/seed.js'
-import { fetchManatalCandidates, hasManatalKey, starterDraft } from '../server/manatal.js'
+import { fetchManatalCandidates, fetchCandidateDetail, hasManatalKey, starterDraft } from '../server/manatal.js'
 import { draftMessage, classifyReply, hasDeepSeekKey } from '../server/ai.js'
 import { authRequired, checkCredentials, makeToken, requireAuth } from '../server/auth.js'
 
@@ -182,6 +182,19 @@ app.post('/api/ai-message', async (req, res) => {
 app.post('/api/ai-classify', async (req, res) => {
   if (!req.body.text) return res.status(400).json({ error: 'text is required' })
   res.json(await classifyReply(req.body.text))
+})
+
+// Full candidate detail + résumé + applied job(s), pulled live from Manatal.
+app.post('/api/candidate-detail', async (req, res) => {
+  const { manatalId } = req.body || {}
+  if (!manatalId) return res.status(400).json({ error: 'manatalId required' })
+  if (!hasManatalKey())
+    return res.status(400).json({ error: 'no_key', reason: 'Manatal is not connected.' })
+  try {
+    res.json(await fetchCandidateDetail(manatalId))
+  } catch (err) {
+    res.status(502).json({ error: 'manatal_failed', reason: err.message })
+  }
 })
 
 // Manually re-pull from Manatal.

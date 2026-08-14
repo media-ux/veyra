@@ -14,6 +14,67 @@ export function hasManatalKey() {
   return Boolean(process.env.MANATAL_API_KEY)
 }
 
+async function manatalGet(path) {
+  const res = await fetch(`${BASE}${path}`, {
+    headers: {
+      Authorization: `Token ${process.env.MANATAL_API_KEY}`,
+      Accept: 'application/json',
+    },
+  })
+  if (!res.ok) throw new Error(`Manatal API ${res.status} on ${path}`)
+  return res.json()
+}
+
+// Full detail for one candidate: richer profile + uploaded documents (résumé/CV)
+// + which job(s) they applied to. Each sub-call is wrapped so a missing piece
+// never blocks the rest. Field names are read defensively (Manatal varies).
+export async function fetchCandidateDetail(manatalId) {
+  if (!hasManatalKey()) throw new Error('MANATAL_API_KEY is not set')
+  const id = encodeURIComponent(manatalId)
+
+  const detail = await manatalGet(`/candidates/${id}/`)
+
+  let documents = []
+  try {
+    const docs = await manatalGet(`/candidates/${id}/documents/`)
+    const rows = Array.isArray(docs) ? docs : docs.results || []
+    documents = rows
+      .map((d) => ({
+        name: d.name || d.filename || d.title || 'Document',
+        url: d.file || d.url || d.download_url || d.document || '',
+      }))
+      .filter((d) => d.url)
+  } catch {
+    /* no documents endpoint / none uploaded */
+  }
+
+  let appliedFor = []
+  try {
+    const matches = await manatalGet(`/candidates/${id}/matches/`)
+    const rows = Array.isArray(matches) ? matches : matches.results || []
+    appliedFor = rows
+      .map((m) => {
+        const job = m.job || m.position || {}
+        return job.position_name || job.name || job.title || m.position_name || null
+      })
+      .filter(Boolean)
+  } catch {
+    /* no matches / not exposed */
+  }
+
+  const mapped = mapCandidate(detail)
+  const resume =
+    documents.find((d) => /resume|cv|curriculum|résumé/i.test(d.name)) || documents[0] || null
+
+  return {
+    ...mapped,
+    manatalId: String(detail.id ?? manatalId),
+    documents,
+    resumeUrl: resume?.url || detail.resume || detail.cv || null,
+    appliedFor,
+  }
+}
+
 export async function fetchManatalCandidates({ limit = 40 } = {}) {
   if (!hasManatalKey()) throw new Error('MANATAL_API_KEY is not set in .env')
 

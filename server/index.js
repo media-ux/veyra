@@ -12,7 +12,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import { read, write, reset, makeId } from './store.js'
 import { draftMessage, classifyReply, hasDeepSeekKey } from './ai.js'
-import { fetchManatalCandidates, hasManatalKey, starterDraft } from './manatal.js'
+import { fetchManatalCandidates, fetchCandidateDetail, hasManatalKey, starterDraft } from './manatal.js'
 import { authRequired, checkCredentials, makeToken, requireAuth } from './auth.js'
 
 dotenv.config()
@@ -51,6 +51,19 @@ app.get('/api/connections', (_req, res) => {
 // Pull real candidates from Manatal and replace the candidate list + rebuild
 // the send queue. Requires MANATAL_API_KEY in .env. Returns a clear error if
 // the key is missing or the API call fails.
+// Full candidate detail + résumé + applied job(s), pulled live from Manatal.
+app.post('/api/candidate-detail', async (req, res) => {
+  const { manatalId } = req.body || {}
+  if (!manatalId) return res.status(400).json({ error: 'manatalId required' })
+  if (!hasManatalKey())
+    return res.status(400).json({ error: 'no_key', reason: 'Manatal is not connected.' })
+  try {
+    res.json(await fetchCandidateDetail(manatalId))
+  } catch (err) {
+    res.status(502).json({ error: 'manatal_failed', reason: err.message })
+  }
+})
+
 app.post('/api/manatal-sync', async (_req, res) => {
   if (!hasManatalKey()) {
     return res.status(400).json({ error: 'no_key', reason: 'Add MANATAL_API_KEY to .env, then restart.' })

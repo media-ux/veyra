@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { GripVertical, MapPin } from 'lucide-react'
 import { getCandidates, updateCandidate } from '../lib/data.js'
@@ -6,6 +6,7 @@ import PageHeader from '../components/PageHeader.jsx'
 import { Skeleton } from '../components/Skeleton.jsx'
 import { useToast } from '../components/Toast.jsx'
 import Avatar from '../components/Avatar.jsx'
+import CandidateModal from '../components/CandidateModal.jsx'
 import { STAGES, matchColor } from '../lib/format.js'
 
 export default function Pipeline() {
@@ -13,6 +14,8 @@ export default function Pipeline() {
   const [candidates, setCandidates] = useState(null)
   const [draggingId, setDraggingId] = useState(null)
   const [overStage, setOverStage] = useState(null)
+  const [selected, setSelected] = useState(null) // candidate whose detail modal is open
+  const movedRef = useRef(false) // true if a drag happened, so we don't treat it as a click
 
   useEffect(() => {
     getCandidates().then(setCandidates)
@@ -100,10 +103,16 @@ export default function Pipeline() {
                         onDragStart={(e) => {
                           e.dataTransfer.setData('text/plain', c.id)
                           e.dataTransfer.effectAllowed = 'move'
+                          movedRef.current = true
                           setDraggingId(c.id)
                         }}
                         onDragEnd={() => setDraggingId(null)}
-                        className="group cursor-grab rounded-xl border border-black/5 bg-base-600/80 p-3 active:cursor-grabbing"
+                        onMouseDown={() => (movedRef.current = false)}
+                        onClick={() => {
+                          // Ignore the click that follows a drag; open detail on a real click.
+                          if (!movedRef.current) setSelected(c)
+                        }}
+                        className="group cursor-pointer rounded-xl border border-black/5 bg-white p-3 shadow-soft transition-shadow hover:shadow-card active:cursor-grabbing"
                       >
                         <div className="flex items-start gap-2.5">
                           <Avatar name={c.name} photoUrl={c.photoUrl} size={36} />
@@ -113,7 +122,7 @@ export default function Pipeline() {
                           </div>
                           <GripVertical
                             size={15}
-                            className="mt-0.5 shrink-0 text-slate-600 opacity-0 transition-opacity group-hover:opacity-100"
+                            className="mt-0.5 shrink-0 cursor-grab text-slate-400 opacity-0 transition-opacity group-hover:opacity-100"
                           />
                         </div>
                         <div className="mt-2.5 flex items-center justify-between">
@@ -136,6 +145,8 @@ export default function Pipeline() {
           })}
         </div>
       )}
+
+      {selected && <CandidateModal candidate={selected} onClose={() => setSelected(null)} />}
     </div>
   )
 }

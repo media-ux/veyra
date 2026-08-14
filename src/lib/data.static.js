@@ -153,6 +153,12 @@ export function syncFromManatal() {
   )
 }
 
+// No live Manatal in the preview — return the known profile with a note.
+export function getCandidateDetail(manatalId) {
+  const c = db.candidates.find((x) => x.manatalId === manatalId || x.id === manatalId) || {}
+  return delay({ ...c, documents: [], resumeUrl: null, appliedFor: [], demo: true })
+}
+
 export function resetDemoData() {
   db = buildSeed()
   return delay({ ok: true })
